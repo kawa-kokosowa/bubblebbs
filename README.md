@@ -3,8 +3,7 @@
 [![Build
 Status](https://travis-ci.org/lily-mayfield/bubblebbs.svg?branch=master)](https://travis-ci.org/lily-mayfield/bubblebbs)
 
-One-board imageboard where only verified tripcodes can post images and start
-threads (everyone else may only reply to threads with text).
+Text BBS/message board.
 
 ## General technical
 
