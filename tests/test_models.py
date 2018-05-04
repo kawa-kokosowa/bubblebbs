@@ -30,13 +30,13 @@ class TestPost:
         correctly_parsed_nicely_linked = '''
         guess what
 
-        <a href="/posts/42#22">&gt;&gt;22</a>
+        <a href="/threads/42#22">&gt;&gt;22</a>
 
         ur good
 
         &gt;&gt;asdf
 
-        <a href="/posts/42#3">&gt;&gt;3</a>
+        <a href="/threads/42#3">&gt;&gt;3</a>
 
         &gt;dlasjf;lkjsd
 
@@ -44,8 +44,8 @@ class TestPost:
 
         your &gt;&gt; butt &gt;&gt; 33
 
-        afsoiu wfkj wfe <a href="/posts/42#22">&gt;&gt;22</a> ajs;lfkjasf<a href="/posts/42#22">&gt;&gt;22</a>
+        afsoiu wfkj wfe <a href="/threads/42#22">&gt;&gt;22</a> ajs;lfkjasf<a href="/threads/42#22">&gt;&gt;22</a>
 
-        <a href="/posts/42#33">&gt;&gt;33</a>f
+        <a href="/threads/42#33">&gt;&gt;33</a>f
         '''
         assert hopefully_nicely_linked == correctly_parsed_nicely_linked
