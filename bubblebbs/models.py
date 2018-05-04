@@ -31,6 +31,7 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     bumptime = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
 
+    # FIXME: rename to_dict() and use summary output not full output
     def __iter__(self):
         """Turn into dict with dict(post)"""
         for column in self.__table__.columns:
