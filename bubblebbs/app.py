@@ -52,11 +52,13 @@ def board_index():
                 models.Post.message.like(like_query),
             )
             .order_by(models.Post.bumptime.desc())
+            .all()
         )
     else:
         posts = (
             models.Post.query.filter(models.Post.reply_to == None)
             .order_by(models.Post.bumptime.desc())
+            .all()
         )
 
     for post in posts:
