@@ -119,7 +119,7 @@ class Post(db.Model):
         db.session.commit()
 
         if reply_to:
-            original = db.session.query(Post).get(new_post.reply_to)
+            original = db.session.query(Post).get(reply_to)
             original.bumptime = datetime.datetime.utcnow()
             db.session.commit()
 

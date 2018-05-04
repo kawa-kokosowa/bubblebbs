@@ -43,16 +43,31 @@ a:hover {
 
 .whitebg {
   background-color: #fff;
+  overflow-x:auto; 
 }
 
 #list-threads {
   text-align: left;
   white-space: nowrap;
+  width: 100%;
+}
+
+#list-threads th,
+#list-threads td {
+  max-width: 25vw;
+}
+
+#list-threads th,
+#list-threads td,
+#list-threads a {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #list-threads th:first-child,
 #list-threads td:first-child {
   width: 100%;
+  text-overflow: ellipsis;
 }
 
 #list-threads th:nth-child(even),
