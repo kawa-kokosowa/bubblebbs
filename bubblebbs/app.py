@@ -3,7 +3,7 @@ import os
 import random
 
 from flask import (
-    Flask, redirect, render_template, url_for, send_from_directory, request, send_file
+    Flask, redirect, render_template, url_for, send_from_directory, request, send_file, jsonify
 )
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
@@ -21,6 +21,20 @@ app.config.from_object(config)
 def config_db(key: str) -> str:
     """lol"""
     return models.ConfigPair.query.get(key).value
+
+
+@app.route("/search-json", methods=['GET'])
+def search_json():
+    search_for_this_text = request.args.get('search')
+    like_query = '%' + search_for_this_text + '%'
+    posts = (
+        models.Post.query.filter(
+            models.Post.message.like(like_query),
+        )
+        .order_by(models.Post.bumptime.desc())
+        .all()
+    )
+    return jsonify([dict(p) for p in posts])
 
 
 @app.route("/", methods=['GET'])

@@ -31,6 +31,11 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     bumptime = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
 
+    def __iter__(self):
+        """Turn into dict with dict(post)"""
+        for column in self.__table__.columns:
+            yield column.name, getattr(self, column.name)
+
     @staticmethod
     def reference_links(message: str, thread_id: int) -> str:
         """Parse >>id links"""
