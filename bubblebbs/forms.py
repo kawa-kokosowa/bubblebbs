@@ -11,6 +11,9 @@ class NewPostForm(FlaskForm):
 
     """
 
-    name = StringField('Name')
+    name = StringField(
+        'Name',
+        render_kw={'placeholder': 'name#tripcode'},
+    )
     message = TextAreaField('Message', validators=[DataRequired()])
     reply_to = HiddenField('reply_to')
