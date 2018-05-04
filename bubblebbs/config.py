@@ -6,5 +6,5 @@ SITE_TAGLINE = os.environ.get('BBBS_SITE_TAGLINE', 'some tagline')
 SITE_TITLE = os.environ.get('BBBS_SITE_TAGLINE', 'super title')
 SITE_FOOTER = os.environ.get(
     'BBBS_SITE_FOOTER',
-    '<a href="https://github.com/lily-mayfield/bbbs">Powered by BBBS</a>',
+    '<a href="https://github.com/lily-mayfield/bubblebbs">Powered by BubbleBBS</a>',
 )

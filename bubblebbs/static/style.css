@@ -45,8 +45,23 @@ a:hover {
   background-color: #fff;
 }
 
-#list-threads th:nth-child(1),
-#list-threads td:nth-child(1) {
+#list-threads {
+  text-align: left;
+  white-space: nowrap;
+}
+
+#list-threads th:first-child,
+#list-threads td:first-child {
+  width: 100%;
+}
+
+#list-threads th:nth-child(even),
+#list-threads td:nth-child(even) {
+  text-align: right;
+}
+
+#list-threads td:last-child,
+#list-threads th:last-child {
   text-align: left;
 }
 
