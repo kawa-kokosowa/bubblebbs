@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Thread #{{ post.id }}{% endblock %}
+
+{% block content %}
+
+<div class="thread">
+    <div class="op">
+        <h1>#{{ post.id }}</h1>
+        <p class="message">{{ post.message | safe }}</p>
+        <div class="meta">{{ post_name(post) }} at {{ post.timestamp }}</div>
+    </div>
+
+      {% for reply in replies %}
+          <div class="reply" id="{{ reply.id }}">
+            <h2>#{{ reply.id }}</h2>
+            <p class="message">{{ reply.message | safe }}</p>
+            <div class="meta">{{ post_name(reply) }} at {{ reply.timestamp }}</div>
+          </div>
+      {% endfor %}
+
+    <form action="/replies/new" method="POST" enctype="multipart/form-data">
+      <fieldset>
+        <legend>Create reply</legend>
+        {{ form.csrf_token() }}
+        <label>Name: {{ form.name }}</label>
+        <label>Message: {{ form.message }}</label>
+        {{ form.reply_to(value=post.id) }}
+        <input type="submit" value="Post!">
+      </fieldset>
+    </form>
+</div>
+{% endblock %}

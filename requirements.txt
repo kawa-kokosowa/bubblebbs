@@ -1,0 +1,16 @@
+click==6.7
+Flask==0.12.2
+Flask-Admin==1.5.1
+Flask-Login==0.4.1
+Flask-SQLAlchemy==2.3.2
+Flask-WTF==0.14.2
+itsdangerous==0.24
+Jinja2==2.10
+MarkupSafe==1.0
+requests==2.6.0
+six==1.9.0
+SQLAlchemy==1.2.5
+Werkzeug==0.14.1
+WTForms==2.1
+scrypt==0.8.6
+pytest==3.5.0

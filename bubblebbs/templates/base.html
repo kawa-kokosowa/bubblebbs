@@ -1,0 +1,49 @@
+{% macro thread_permalink_summary(post) -%}
+    <a href="/threads/{% if post.reply_to %}{{ post.reply_to }}#{% endif %}{{ post.id }}">#{{ post.id }}: {{ post.message[:140] | striptags }}</a>
+{%- endmacro %}
+
+{% macro post_name(post) -%}
+    {% if post.name %}{{ post.name }}{% if post.tripcode %}<span class="tripcode">#{{ post.tripcode }}</span>{% endif %}{% else %}Anonymous{% endif %}
+{%- endmacro %}
+<html>
+<head>
+  {% block head %}
+  <title>{% block title %}{% endblock %} - {{ config_db('site_title') }}</title>
+  <link rel="stylesheet" type="text/css" href="/static/style.css">
+  {% endblock %}
+</head>
+<body>
+
+<header class="brand">
+  <h1><a href="/">{{ config_db('site_title') }}</a></h1>
+  <p>{{ config_db('site_tagline') | safe }}</p>
+  <div class="blotter">
+    <ul>
+    {% for entry in blotter_entries %}
+      <li>{{ entry.timestamp }}: {{ entry.text }}</li>
+    {% endfor %}
+    </ul>
+  </div>
+</header>
+
+<div class="whitebg">
+
+  <nav id="actions">
+    <ul>
+      <li><a href="/threads/new">Create new thread</a></li>
+      <li><a href="/">List Threads by Bumptime</a></li>
+    </ul>
+    <form class="search-box" action="/" method="GET" enctype="application/x-www-form-urlencoded">
+      <input type="text" id="search" name="search" placeholder="search threads and replies" tabindex=1>
+      <input type="submit" value="search 🔍" tabindex=2>
+    </form>
+  </nav>
+
+  {% block content %}
+
+  {% endblock %}
+
+</div>
+<footer class="page-footer">{{ config_db('site_footer') | safe }}</footer>
+</body>
+</html>

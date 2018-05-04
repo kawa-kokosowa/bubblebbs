@@ -1,0 +1,7 @@
+bubblebbs/static/thumbnails
+bubblebbs/static/uploads
+__pycache__
+.pytest_cache/
+*.db
+bubblebbs/*.db
+.env-file

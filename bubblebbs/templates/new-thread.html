@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}New Thread{% endblock %}
+
+{% block content %}
+<form action="/threads/new" method="POST" enctype="multipart/form-data">
+  <fieldset>
+    <legend>Start a new thread</legend>
+    {{ form.csrf_token() }}
+    <label>Name: {{ form.name }}</label>
+    <label>Message: {{ form.message }}</label>
+    <input type="submit" value="Post!">
+  </fieldset>
+</form>
+{% endblock %}

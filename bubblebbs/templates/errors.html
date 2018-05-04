@@ -1,0 +1,22 @@
+
+{% extends "base.html" %}
+{% block title %}ERROR{% endblock %}
+
+{% block content %}
+
+<aside class="return">
+    <a href="/">return</a>
+    <h2>Error</h2>
+</aside>
+
+<h2 class="error-title">⚠️There was a problem with your submission!⚠️</h2>
+
+<ul class="errors">
+{% for error in errors %}
+  <li>{{ error }}</li>
+{% endfor %}
+</ul>
+
+<img src="/error-page-image" alt="random image">
+
+{% endblock %}

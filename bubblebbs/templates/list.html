@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}List Threads by Bumptime{% endblock %}
+
+{% block content %}
+<table id="list-threads">
+    <thead>
+        <tr>
+            <th>First 140 characters</th>
+            <th>Author</th>
+            <th>Timestamp</th>
+            <th>Replies</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for post in posts %}
+        <tr>
+            <td>{{ thread_permalink_summary(post) }}</td>
+            <td>{{ post_name(post) }}</td>
+            <td><time>{{ post.timestamp }}</time></td>
+            <td>{{ post.reply_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

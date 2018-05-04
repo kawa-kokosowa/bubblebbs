@@ -1,0 +1,12 @@
+version: '3.2'
+
+services:
+    bubblebbs:
+        restart: always
+        build: .
+        image: bubblebbs
+        volumes: ['.:/app']
+        env_file:
+            - .env-file
+        expose:
+            - "80"
