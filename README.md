@@ -5,18 +5,12 @@ Status](https://travis-ci.org/lily-mayfield/bubblebbs.svg?branch=master)](https:
 
 Text BBS/message board.
 
+This project is in alpha. It is currently unversioned and very messy. It lacks
+basic features like limiting, captcha, etc.
+
 ## General technical
 
-This project is in alpha, it is poorly documented and very messy, it is not
-recommended for production.
-
 Admins login at `/admin` with the default username `admin` and default password `admin`.
-
-When you run docker you can see the IP it's listening on by using `docker
-inspect containername`.
-
-The default verified tripcode is `lol` so put something like `name#lol` in the
-name field when posting.
 
 When you use docker at all be sure to `touch .env-file`.
 
@@ -25,7 +19,7 @@ When you use docker at all be sure to `touch .env-file`.
 You can also run the above locally to test out the production configuration for
 bubblebbs.
 
-`docker-compose build; docker-compose run -d --rm -p 0.0.0.0:80:80 bubblebbs`
+`./launch-docker.sh prod`
 
 ## Testing
 
@@ -46,11 +40,11 @@ You can run tests with `pytest` in the project root.
 
 ### Run tests in Docker
 
-`docker-compose build && docker-compose run bubblebbs pytest`
+`./launch-docker.sh pytest`
 
 ### Debugging in Docker
 
 Run a server which reloads in a second within detecting
 code changes:
 
-`docker-compose build && docker-compose run -d --rm -p 0.0.0.0:8080:8080 bubblebbs debug`
+`./launch-docker.sh debug`
