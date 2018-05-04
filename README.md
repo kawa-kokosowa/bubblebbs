@@ -18,6 +18,8 @@ inspect containername`.
 The default verified tripcode is `lol` so put something like `name#lol` in the
 name field when posting.
 
+When you use docker at all be sure to `touch .env-file`.
+
 ## Production
 
 You can also run the above locally to test out the production configuration for
