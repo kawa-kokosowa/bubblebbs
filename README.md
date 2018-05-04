@@ -10,23 +10,25 @@ basic features like limiting, captcha, etc.
 
 ## General technical
 
+Before you start:
+
+  * Make sure you're using latest Docker and docker-compose, install according to
+    Docker community instructions, don't install via your distribution's repo (it's
+    probably way out-of-date!).
+  * Docker will look for `.env-file`. So you need to `touch .env-file`.
+
+There are multiple ways to run the app:
+
+  * For production: Use Docker, `./launch-docker.sh prod`
+  * To debug: either look at the "debugging without docker" section in this
+    `README` or use `./launch-docker.sh debug`
+  * Running tests: if you followed the "debugging without docker" section you
+    can simply run `pytest` in the project root. Otherwise use
+    `./launch-docker.sh pytest`.
+
 Admins login at `/admin` with the default username `admin` and default password `admin`.
 
-When you use docker at all be sure to `touch .env-file`.
-
-## Production
-
-You can also run the above locally to test out the production configuration for
-bubblebbs.
-
-`./launch-docker.sh prod`
-
-## Testing
-
-It's nice to run tests in Docker way because it eliminates the requirement of setting
-up/installing dependencies and the like.
-
-### Host
+## Debugging without Docker
 
 You can still fiddle around with `bubblebbs` like you would any ol' Python code:
 
@@ -37,14 +39,3 @@ You can still fiddle around with `bubblebbs` like you would any ol' Python code:
   1. http://localhost:8080/
 
 You can run tests with `pytest` in the project root.
-
-### Run tests in Docker
-
-`./launch-docker.sh pytest`
-
-### Debugging in Docker
-
-Run a server which reloads in a second within detecting
-code changes:
-
-`./launch-docker.sh debug`
