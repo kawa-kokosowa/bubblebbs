@@ -11,10 +11,12 @@ docker-compose build
 if [ "$1" == "prod" ]; then 
     echo "Running app in production mode!"
     docker-compose run -d --rm -p 0.0.0.0:80:80 bubblebbs
+    echo "Runing at http://localhost/"
 elif [ "$1" == "pytest" ]; then
     echo "Run pytest in Docker container!"
     docker-compose run bubblebbs pytest
 elif [ "$1" == "debug" ]; then
     echo "Run app in debug mode!"
     docker-compose run -d --rm -p 0.0.0.0:8080:8080 bubblebbs debug
+    echo "Runing at http://localhost:8080/"
 fi
