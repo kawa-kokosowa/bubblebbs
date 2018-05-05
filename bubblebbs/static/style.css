@@ -96,6 +96,10 @@ a:hover {
   height: 3rem;
 }
 
+#list-threads th:first-child {
+  padding-left: 10px
+}
+
 #list-threads tbody tr:nth-child(even) {
   background-color: var(--soft-grey);
 }
