@@ -49,12 +49,12 @@ a:hover {
 #list-threads {
   text-align: left;
   white-space: nowrap;
-  width: 100%;
+  max-width: 100%;
 }
 
 #list-threads th,
 #list-threads td {
-  max-width: 25vw;
+  max-width: 20vw;
 }
 
 #list-threads th,
@@ -113,6 +113,10 @@ a:hover {
   border-collapse: collapse;
 }
 
+#actions {
+  padding: 0 10px;
+}
+
 #actions ul {
   list-style-type: none;
 }
@@ -123,7 +127,6 @@ a:hover {
 }
 
 #actions li:first-child {
-  padding-left: 10px;
   padding-right: 10px;
 }
 
@@ -139,28 +142,51 @@ a:hover {
   background-color: var(--mint-green);
 }
 
+.op header {
+  background-color: var(--soft-yellow);
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.op .meta {
+  font-size: 1rem;
+}
+
+.op .tripcode {
+  font-size: 0.75rem;
+  font-weight: normal;
+  font-family: monospaced;
+  text-transform: none;
+}
+
 .brand {
   text-align: center;
 }
 
 .brand p {
-  ...
+  color: var(--hard-grey);
+  font-style: italic;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
+.brand h1 {
+  line-height: 3rem;
 }
 
 .thread {
   padding: 0 20px;
 }
 
-h1,
-h2 {
-  color: #000;
+h2,
+h3 {
   margin-bottom: 0.75rem;
   margin-top: 2.25rem;
 }
 
-.brand h1 {
-  margin-bottom: 0.75rem;
-  margin-top: 2.25rem;
+.op header h2 {
+  margin: 0;
 }
 
 .brand h1 a {
@@ -177,8 +203,7 @@ legend {
 }
 
 .reply {
-  background: var(--soft-pink);
-  display: inline-block;
+  display: block;
   padding: 1.5rem 40px;
   box-sizing: border-box;
   clear: left;
@@ -200,29 +225,7 @@ legend {
   height: 1.5rem;
   border: none;
   padding: 0 10px;
-  width: 25rem;
   background-color: var(--soft-grey);
-}
-
-header p {
-  font-style: italic;
-}
-
-.reply + .reply {
-  display: table;
-}
-
-.reply + .reply {
-  clear: both;
-}
-
-
-.reply + .op {
-  margin-top: 3rem;
-}
-
-.op {
-  padding: 0 10px;
 }
 
 .op:before {
@@ -230,16 +233,24 @@ header p {
   clear: both;
   content: '';
   height: 1.5rem;
-  border-top: 2px dashed #fff;
   margin-top: 1.5rem;
 }
 
 .reply header,
 .op header,
 .reply + .op ,
-.op header h1, {
-  margin: 0 !important;
-  min-width: 0 !important;
+.op header h2, {
+  margin: 0;
+  min-width: 0;
+}
+
+fieldset legend {
+  font-size: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+fieldset {
+  border: none;
 }
 
 .reply {
@@ -255,12 +266,9 @@ header {
 }
 
 header p {
-  text-style: italic;
-  font-size: 0.875rem;
-  line-height: 1.5rem;
 }
 
-.reply h2 {
+.reply h3 {
   margin: 0;
   padding:0
 }
@@ -269,7 +277,7 @@ header p {
   background-color: var(--soft-yellow);
 }
 
-.reply h2:before {
+.reply h3:before {
   content: '\2bb9';
   color: var(--olive-green);
   font-size: 1.5rem;
@@ -277,29 +285,24 @@ header p {
   padding-right: 10px;
 }
 
-
-.message {
-}
-
 .page-footer {
   clear: both;
   padding-bottom: 1.5rem;
-  padding-top: 3rem;
+  margin-top: 1.5rem;
   text-align: center;
 }
 
 fieldset,
 .blotter {
-  width: 600px;
+  width: 100%;
   margin: 1.5rem auto 1.5rem auto;
-  border: 2px solid var(--sienna);
-  color: var(--sienna);
   padding: 0 10px;
 }
 
 .blotter {
+  font-size: 0.85rem;
+  line-height: 1.5rem;
   border: none;
-  margin: 1.5rem auto 3rem auto;
 }
 
 .blotter ul {
@@ -310,67 +313,65 @@ label {
   clear: both;
   width: 100%;
   display: block;
+  font-weight: bold;
 }
 
 label input[type=text],
-label input[type=file],
 label textarea {
   float: right;
-  width: 400px;
+  width: 75%;
+}
+
+
+input[type=text] {
+  height: 3rem;
+  background-color: var(--soft-grey);
+  border: none;
+  line-height: 3rem;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+textarea,
+input[type=text] {
+  font-family: 'Open Sans', sans-serif;
+}
+
+textarea {
+  background-color: var(--soft-grey);
+  border: none;
+  height: 6rem;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-top: 1px dashed var(--hard-grey);
+}
+
+#actions input[type=submit] {
+  margin: 0;
+  height: 1.5rem;
+  line-height: 1.5rem;
+}
+
+input[type=submit] {
+  height: 3rem;
+  line-height: 3rem;
+  margin: 1.5rem 0 0 0;
+  background-color: var(--bubble-blue);
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+input[type=submit]:hover {
+  text-decoration: underline;
+  background-color: var(--olive-green);
 }
 
 fieldset input[type=submit] {
   width: 100%;
-}
-
-.thumbnail {
-  float: left;
-  margin: 0 20px 1.5rem 0;
-}
-
-article {
-  display: inline;
-}
-
-
-.reply + .op::before,
-.op + .op::before {
-  display: block;
-  content: ' ';
-  width: 100%;
-  clear: both;
-}
-
-.reply + .op {
-  padding-top: 3rem;
-  margin-top: 3rem;
-}
-
-.pagination:before {
-  display: block;
-  content: ' ';
-  height: 3rem;
-}
-
-.pagination {
-  display: block;
-  clear: both;
-  padding: 0 10px;
-  margin: 0 10px;
-}
-
-.pagination li {
-  display: inline-block;
-}
-
-.pagination li a {
-  background-color: var(--primary-bg-color);
-  font-weight: bold;
-  padding: 0 10px;
-}
-
-.pagination li a:hover {
-  background-color: #ffffee;
 }
 
 .errors {
@@ -391,29 +392,6 @@ article {
   color: var(--olive);
 }
 
-.trapcode {
-  opacity: 0.6;
-  font-size: 0.75rem;
-  line-height: 2rem;
-}
-
-.return {
-  background-color: var(--soft-blue);
-  margin: 3rem 0 1.5rem 0;
-  color: #fff;
-  font-weight: bold;
-}
-
-.return a,
-.return a:link,
-.return a:visited {
-  color: #fff;
-}
-
 .tripcode {
   color: var(--hard-grey);
-}
-
-.omitted {
-  padding: 1.5rem 0;
 }

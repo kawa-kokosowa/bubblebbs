@@ -4,15 +4,17 @@
 {% block content %}
 
 <div class="thread">
-    <div class="op">
-        <h1>#{{ post.id }}</h1>
+    <article class="op">
+        <header>
+            <h2>Thread #{{ post.id }} by {{ post_name(post) }}</h2>
+            <p class="meta"><time>{{ post.timestamp }}</time></p>
+        </header>
         <p class="message">{{ post.message | safe }}</p>
-        <div class="meta">{{ post_name(post) }} at {{ post.timestamp }}</div>
-    </div>
+    </article>
 
       {% for reply in replies %}
           <div class="reply" id="{{ reply.id }}">
-            <h2>#{{ reply.id }}</h2>
+            <h3>#{{ reply.id }}</h3>
             <p class="message">{{ reply.message | safe }}</p>
             <div class="meta">{{ post_name(reply) }} at {{ reply.timestamp }}</div>
           </div>

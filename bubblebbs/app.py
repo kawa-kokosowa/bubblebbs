@@ -1,4 +1,3 @@
-# TODO: limiter, caching
 import os
 import random
 
