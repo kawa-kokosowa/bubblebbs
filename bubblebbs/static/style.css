@@ -351,10 +351,8 @@ textarea {
   border-top: 1px dashed var(--hard-grey);
 }
 
-#actions input[type=submit] {
-}
-
 input[type=submit] {
+  -webkit-appearance: none;
   height: 3rem;
   line-height: 3rem;
   margin: 1.5rem 0 0 0;
