@@ -83,9 +83,15 @@ a:hover {
   text-align: left;
 }
 
+#list-threads .tripcode {
+  font-size: 0.8rem;
+  line-height: 1.5rem;
+  font-family: monospaced;
+}
+
 #list-threads td,
 #list-threads th {
-  padding: 0 10px;
+  padding: 0 10px 0 0;
   line-height: 3rem;
   height: 3rem;
 }
@@ -104,6 +110,7 @@ a:hover {
   display: block;
   line-height: 3rem;
   height: 3rem;
+  padding-left: 10px;
 }
 
 #list-threads a:hover {
@@ -417,6 +424,19 @@ fieldset input[type=submit] {
   html,
   body {
     font-size: 12px;
+    padding: 0;
+  }
+
+  #list-threads {
+    font-size: 0.90rem;
+  }
+
+  #list-threads th {
+    font-weight: normal;
+  }
+
+  #list-threads td,
+  #list-threads th {
     padding: 0;
   }
 }
