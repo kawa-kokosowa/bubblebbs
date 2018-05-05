@@ -27,18 +27,19 @@
   </div>
 </header>
 
-<div class="whitebg">
+<nav id="actions">
+  <ul>
+    <li><a href="/threads/new">Create thread</a></li>
+    <li><a href="/">All threads</a></li>
+  </ul>
+  <form class="search-box" action="/" method="GET" enctype="application/x-www-form-urlencoded">
+    <input type="text" id="search" name="search" class="search-input"
+           placeholder="search threads and replies" tabindex=1>
+    <input type="submit" value="search 🔍" tabindex=2 class="search-submit">
+  </form>
+</nav>
 
-  <nav id="actions">
-    <ul>
-      <li><a href="/threads/new">Create new thread</a></li>
-      <li><a href="/">List Threads by Bumptime</a></li>
-    </ul>
-    <form class="search-box" action="/" method="GET" enctype="application/x-www-form-urlencoded">
-      <input type="text" id="search" name="search" placeholder="search threads and replies" tabindex=1>
-      <input type="submit" value="search 🔍" tabindex=2>
-    </form>
-  </nav>
+<div class="whitebg">
 
   {% block content %}
 

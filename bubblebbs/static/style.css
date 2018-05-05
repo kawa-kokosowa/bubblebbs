@@ -18,12 +18,14 @@
 
 html,
 body {
+  background-image: url('bg.png');
+  background-attachment: fixed;
   font-family: 'Open Sans', sans-serif;
   background-color: var(--bubble-blue);
   min-height: 100vh;
   height: 100%;
   line-height: 1.5rem;
-  font-size: 16px;
+  font-size: 14px;
   margin: 0;
 }
 
@@ -44,12 +46,13 @@ a:hover {
 .whitebg {
   background-color: #fff;
   overflow-x:auto; 
+  width: 100%;
 }
 
 #list-threads {
   text-align: left;
   white-space: nowrap;
-  max-width: 100%;
+  width: 100%;
 }
 
 #list-threads th,
@@ -114,7 +117,13 @@ a:hover {
 }
 
 #actions {
-  padding: 0 10px;
+  padding: 0;
+  line-height: 3rem;
+}
+
+#actions a {
+  display: inline-block;
+  height: 3rem;
 }
 
 #actions ul {
@@ -220,12 +229,6 @@ legend {
 }
 
 .search-box input[type=text] {
-  border: none;
-  line-height: 1.5rem;
-  height: 1.5rem;
-  border: none;
-  padding: 0 10px;
-  background-color: var(--soft-grey);
 }
 
 .op:before {
@@ -349,9 +352,6 @@ textarea {
 }
 
 #actions input[type=submit] {
-  margin: 0;
-  height: 1.5rem;
-  line-height: 1.5rem;
 }
 
 input[type=submit] {
@@ -394,4 +394,31 @@ fieldset input[type=submit] {
 
 .tripcode {
   color: var(--hard-grey);
+}
+
+.search-input,
+.search-submit {
+  float: left;
+  display: block;
+  margin: 0 !important;
+  height: 3rem;
+  line-height: 3rem;
+}
+
+.search-input {
+  border: none;
+  line-height: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  padding: 0 10px;
+  background-color: var(--soft-grey);
+}
+
+@media screen and (max-width: 600px)
+{
+  html,
+  body {
+    font-size: 12px;
+    padding: 0;
+  }
 }
