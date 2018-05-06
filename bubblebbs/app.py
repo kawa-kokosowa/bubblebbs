@@ -215,7 +215,7 @@ with app.app_context():
     admin_ = Admin(app, 'Example: Auth', index_view=moderate.MyAdminIndexView(), base_template='my_master.html')
 
     # Add views
-    admin_.add_view(moderate.MyModelView(models.User, models.db.session))
+    admin_.add_view(moderate.AdminUserModelView(models.User, models.db.session))
     admin_.add_view(moderate.MyModelView(models.Post, models.db.session))
     admin_.add_view(moderate.MyModelView(models.Ban, models.db.session))
     admin_.add_view(moderate.MyModelView(models.BlotterEntry, models.db.session))

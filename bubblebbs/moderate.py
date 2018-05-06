@@ -46,6 +46,24 @@ class LoginForm(form.Form):
         return models.db.session.query(models.User).filter_by(login=self.login.data).first()
 
 
+class PasswordField(fields.TextField):
+
+    def process_data(self, value):
+        self.data = ''  # even if password is already set, don't show hash here
+        # or else it will be double-hashed on save
+        self.orig_hash = value
+
+    def process_formdata(self, valuelist):
+        value = ''
+        if valuelist:
+            value = valuelist[0]
+        if value:
+            self.data = generate_password_hash(value)
+        else:
+            self.data = self.orig_hash
+
+
+# FIXME: when is this used?!
 class RegistrationForm(form.Form):
     login = fields.TextField(validators=[validators.required()])
     email = fields.TextField()
@@ -75,8 +93,15 @@ class MyModelView(sqla.ModelView):
         return login.current_user.is_authenticated
 
 
-class VerifiedTripcodeView(MyModelView):
-    form_columns = ['tripcode']
+class AdminUserModelView(MyModelView):
+    form_overrides = dict(
+        password=PasswordField,
+    )
+    form_widget_args = dict(
+        password={
+            'placeholder': 'Enter new password here to change password',
+        },
+    )
 
 
 class ConfigView(MyModelView):
@@ -109,6 +134,7 @@ class MyAdminIndexView(admin.AdminIndexView):
         self._template_args['link'] = link
         return super(MyAdminIndexView, self).index()
 
+    # FIXME: what the heck is this?!
     @expose('/register/', methods=('GET', 'POST'))
     def register_view(self):
         form = RegistrationForm(request.form)
