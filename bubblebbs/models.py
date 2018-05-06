@@ -9,6 +9,7 @@ from typing import Tuple, Union
 from urllib.parse import urlparse
 
 import scrypt
+import markdown2
 from jinja2 import Markup
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
@@ -48,6 +49,14 @@ class Post(db.Model):
             sanitized_message,
         )
         return message_with_links
+
+    # FIXME: dangerous because untested for vulns
+    @staticmethod
+    def parse_markdown(message: str) -> str:
+        return markdown2.markdown(
+            message,
+            extras=['footnotes'],
+        )
 
     # FIXME: what if passed a name which contains no tripcode?
     @staticmethod
@@ -108,6 +117,9 @@ class Post(db.Model):
         except (ValueError, AttributeError) as e:
             reply_to = None
             message = form.message.data
+
+        # Parse markdown! FIXME: this probably can be easily exploited...
+        message = cls.parse_markdown(message)
 
         new_post = cls(
             name=name,

@@ -1,3 +1,4 @@
+attrs==18.1.0
 click==6.7
 Flask==0.12.2
 Flask-Admin==1.5.1
@@ -6,11 +7,15 @@ Flask-SQLAlchemy==2.3.2
 Flask-WTF==0.14.2
 itsdangerous==0.24
 Jinja2==2.10
+markdown2==2.3.5
 MarkupSafe==1.0
+more-itertools==4.1.0
+pluggy==0.6.0
+py==1.5.3
+pytest==3.5.0
 requests==2.6.0
+scrypt==0.8.6
 six==1.9.0
 SQLAlchemy==1.2.5
 Werkzeug==0.14.1
 WTForms==2.1
-scrypt==0.8.6
-pytest==3.5.0
