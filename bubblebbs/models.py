@@ -73,6 +73,7 @@ class Post(db.Model):
                 'ol',
                 'li',
                 'sup',
+                'br',
                 'a',
                 'p',
                 'em',
