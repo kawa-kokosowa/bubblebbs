@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ tripcode }} (Trip Meta){% endblock %}
+
+{% block content %}
+<form action="/trip-meta/{{ tripcode }}/edit" method="POST" enctype="multipart/form-data">
+  <fieldset>
+    <legend>Edit tripcode meta for {{ tripcode }}</legend>
+    {{ form.csrf_token() }}
+    <label>tripcode (unhashed): {{ form.unhashed_tripcode }}</label>
+    <label>bio: {{ form.bio }}</label>
+    <input type="submit" value="Update post meta!">
+  </fieldset>
+</form>
+{% endblock %}

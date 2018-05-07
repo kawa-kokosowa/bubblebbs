@@ -157,6 +157,29 @@ def new_reply():
     return render_template('errors.html', errors=errors), 400
 
 
+@app.route('/trip-meta/<path:tripcode>')
+def view_trip_meta(tripcode: str):
+    trip_meta = models.db.session.query(models.TripMeta).get(tripcode)
+    return render_template('view-trip-meta.html', trip_meta=trip_meta)
+
+
+@app.route('/trip-meta/<path:tripcode>/edit', methods=['POST', 'GET'])
+def edit_trip_meta(tripcode: str):
+    trip_meta_form = forms.TripMetaForm()
+
+    if request.method == 'GET':
+        return render_template('edit-trip-meta.html', form=trip_meta_form, tripcode=tripcode)
+    elif (request.method == 'POST'
+          and trip_meta_form.validate_on_submit()
+          and models.Post.make_tripcode('lol#' + trip_meta_form.unhashed_tripcode.data)[1] == tripcode):
+        trip_meta = models.db.session.query(models.TripMeta).get(tripcode)
+        trip_meta.bio = trip_meta_form.bio.data    
+        models.db.session.commit()
+        return redirect(url_for('view_trip_meta', tripcode=tripcode))
+    else:
+        raise Exception([models.Post.make_tripcode('lol#' + trip_meta_form.unhashed_tripcode.data), tripcode])
+
+
 # FIXME must check if conflicting slug...
 # what if making reply but reply is a comment?!
 @app.route("/threads/new", methods=['GET', 'POST'])
