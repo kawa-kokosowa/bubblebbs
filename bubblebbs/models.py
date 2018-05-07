@@ -32,9 +32,6 @@ class TripMeta(db.Model):
 
     tripcode = db.Column(db.String(20), primary_key=True)
     post_count = db.Column(db.Integer, default=0, nullable=False)
-    twitter = db.Column(db.String(120))
-    url = db.Column(db.String(120))
-    bio = db.Column(db.String(420))
 
 
 # FIXME: bad schema...
