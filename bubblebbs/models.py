@@ -98,7 +98,9 @@ class Post(db.Model):
                 bleach,
                 'markdown.extensions.nl2br',
                 'markdown.extensions.footnotes',
-                WikiLinkExtension(base_url='/threads/', end_url=''),  # FIXME: this isn't very useful and may confuse people
+                'markdown.extensions.toc',
+                'markdown.extensions.def_list',
+                'markdown.extensions.abbr',
             ],
         )
         return md.convert(message)
