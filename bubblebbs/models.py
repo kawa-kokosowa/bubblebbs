@@ -11,6 +11,8 @@ from urllib.parse import urlparse
 import scrypt
 import markdown
 from mdx_bleach.extension import BleachExtension
+from markdown.extensions.footnotes import FootnoteExtension
+from markdown.extensions.wikilinks import WikiLinkExtension
 from jinja2 import Markup
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
@@ -83,8 +85,6 @@ class Post(db.Model):
             styles={},
             protocols=['http', 'https'],
         )
-        from markdown.extensions.footnotes import FootnoteExtension
-        from markdown.extensions.wikilinks import WikiLinkExtension
         slug_timestamp = str(timestamp).replace(' ', '').replace(':', '').replace('.', '')
         FootnoteExtension.get_separator = lambda x: slug_timestamp + '-'
         md = markdown.Markdown(
