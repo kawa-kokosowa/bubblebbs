@@ -24,6 +24,7 @@ db = SQLAlchemy()
 
 
 # FIXME: bad schema...
+# TODO: tags
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
@@ -41,8 +42,9 @@ class Post(db.Model):
         for column in self.__table__.columns:
             yield column.name, getattr(self, column.name)
 
+    # TODO, FIXME
     @staticmethod
-    def extract_tags(message: str):
+    def extract_hashtags(message: str):
         pass
 
     @staticmethod
