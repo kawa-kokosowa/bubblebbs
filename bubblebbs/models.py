@@ -42,6 +42,10 @@ class Post(db.Model):
             yield column.name, getattr(self, column.name)
 
     @staticmethod
+    def extract_tags(message: str):
+        pass
+
+    @staticmethod
     def reference_links(message: str, thread_id: int) -> str:
         """Parse >>id links"""
 
@@ -80,7 +84,7 @@ class Post(db.Model):
                 'h6': ['id'],
                 'li': ['id'],
                 'sup': ['id'],
-                'a': ['href'],
+                'a': ['href'],  # FIXME: can people be deceptive with this?
             },
             styles={},
             protocols=['http', 'https'],
@@ -91,8 +95,8 @@ class Post(db.Model):
             extensions=[
                 bleach,
                 'markdown.extensions.nl2br',
-                'markdown.extensions.footnotes',  # FIXME: what happens when more than one post using footnotes on one page? id conflict! can seed with post id to resolve conflict!
-                WikiLinkExtension(base_url='/threads/', end_url=''),  # FIXME
+                'markdown.extensions.footnotes',
+                WikiLinkExtension(base_url='/threads/', end_url=''),  # FIXME: this isn't very useful and may confuse people
             ],
         )
         return md.convert(message)
