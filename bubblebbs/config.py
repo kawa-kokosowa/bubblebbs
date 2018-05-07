@@ -8,3 +8,4 @@ SITE_FOOTER = os.environ.get(
     'BBBS_SITE_FOOTER',
     '<a href="https://github.com/lily-mayfield/bubblebbs">Powered by BubbleBBS</a>',
 )
+RATELIMIT_STORAGE_URL = 'redis://localhost:6379/1'

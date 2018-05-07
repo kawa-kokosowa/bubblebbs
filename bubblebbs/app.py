@@ -6,6 +6,8 @@ from flask import (
 )
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from . import forms
 from . import config
@@ -15,6 +17,11 @@ from . import moderate
 
 app = Flask(__name__)
 app.config.from_object(config)
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
 
 
 def config_db(key: str) -> str:
@@ -37,6 +44,7 @@ def search_json():
 
 
 @app.route("/", methods=['GET'])
+@limiter.limit("45 per minute")
 def board_index():
     """View threads by bumptime.
 
@@ -78,6 +86,7 @@ def board_index():
 
 # FIXME: check if reply or not for error/404, else...
 @app.route("/threads/<int:post_id>")
+@limiter.limit("30 per minute")
 def view_specific_post(post_id: int):
     """View a thread by ID.
 
@@ -111,6 +120,7 @@ def view_specific_post(post_id: int):
 
 
 @app.route("/replies/new", methods=['POST'])
+@limiter.limit("25 per hour")
 def new_reply():
     """Provide form for new thread on GET, create new thread on POST.
 
@@ -164,6 +174,7 @@ def view_trip_meta(tripcode: str):
 
 
 @app.route('/trip-meta/<path:tripcode>/edit', methods=['POST', 'GET'])
+@limiter.limit("45 per hour")
 def edit_trip_meta(tripcode: str):
     trip_meta_form = forms.TripMetaForm()
 
@@ -183,6 +194,7 @@ def edit_trip_meta(tripcode: str):
 # FIXME must check if conflicting slug...
 # what if making reply but reply is a comment?!
 @app.route("/threads/new", methods=['GET', 'POST'])
+@limiter.limit("10 per hour")
 def new_thread():
     """Provide form for new thread on GET, create new thread on POST.
 

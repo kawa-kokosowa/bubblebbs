@@ -5,7 +5,7 @@ MAINTAINER Lily Mayfield <lily.m.mayfield@gmail.com>
 RUN apk update
 
 # basic flask environment
-RUN apk add --no-cache bash git nginx uwsgi uwsgi-python3 \
+RUN apk add --no-cache bash git nginx uwsgi uwsgi-python3 redis \
     && pip3 install --upgrade pip \
     && pip3 install flask
 
