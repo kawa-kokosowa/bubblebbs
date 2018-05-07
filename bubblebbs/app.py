@@ -85,14 +85,29 @@ def view_specific_post(post_id: int):
 
     form = forms.NewPostForm()
     post = models.db.session.query(models.Post).get(post_id)
-    replies = models.db.session.query(models.Post).filter(models.Post.reply_to == post_id)
-    return render_template(
-        'view-thread.html',
-        form=form,
-        post=post,
-        replies=replies,
-        blotter_entries=get_blotter_entries(),
-    )
+    if post.reply_to:
+        return (
+            render_template(
+                'errors.html',
+                errors=[
+                    'Thread ID supplied is a reply id',
+                    'Thread not found',
+                ],
+            ),
+            404,
+        )
+    else:
+        replies = (
+            models.db.session.query(models.Post)
+            .filter(models.Post.reply_to == post_id)
+        )
+        return render_template(
+            'view-thread.html',
+            form=form,
+            post=post,
+            replies=replies,
+            blotter_entries=get_blotter_entries(),
+        )
 
 
 @app.route("/replies/new", methods=['POST'])

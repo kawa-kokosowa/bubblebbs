@@ -287,8 +287,14 @@ header p {
   padding:0
 }
 
-.reply:target {
+.reply:target,
+sup:target,
+li:target {
   background-color: var(--soft-yellow);
+}
+
+sup:target {
+  border: 1px solid #ff0000;
 }
 
 .reply h3:before {

@@ -9,7 +9,8 @@ from typing import Tuple, Union
 from urllib.parse import urlparse
 
 import scrypt
-import markdown2
+import markdown
+from mdx_bleach.extension import BleachExtension
 from jinja2 import Markup
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
@@ -52,11 +53,49 @@ class Post(db.Model):
 
     # FIXME: dangerous because untested for vulns
     @staticmethod
-    def parse_markdown(message: str) -> str:
-        return markdown2.markdown(
-            message,
-            extras=['footnotes'],
+    def parse_markdown(timestamp: str, message: str) -> str:
+        # FIXME: review, pentest
+        bleach = BleachExtension(
+            tags=[
+                'h3',
+                'h4',
+                'h5',
+                'h6',
+                'ul',
+                'ol',
+                'li',
+                'sup',
+                'a',
+                'p',
+                'em',
+                'strong',
+            ],
+            attributes={
+                '*': [],
+                'h3': ['id'],
+                'h4': ['id'],
+                'h5': ['id'],
+                'h6': ['id'],
+                'li': ['id'],
+                'sup': ['id'],
+                'a': ['href'],
+            },
+            styles={},
+            protocols=['http', 'https'],
         )
+        from markdown.extensions.footnotes import FootnoteExtension
+        from markdown.extensions.wikilinks import WikiLinkExtension
+        slug_timestamp = str(timestamp).replace(' ', '').replace(':', '').replace('.', '')
+        FootnoteExtension.get_separator = lambda x: slug_timestamp + '-'
+        md = markdown.Markdown(
+            extensions=[
+                bleach,
+                'markdown.extensions.nl2br',
+                'markdown.extensions.footnotes',  # FIXME: what happens when more than one post using footnotes on one page? id conflict! can seed with post id to resolve conflict!
+                WikiLinkExtension(base_url='/threads/', end_url=''),  # FIXME
+            ],
+        )
+        return md.convert(message)
 
     # FIXME: what if passed a name which contains no tripcode?
     @staticmethod
@@ -118,12 +157,15 @@ class Post(db.Model):
             reply_to = None
             message = form.message.data
 
+        # manually generate the timestamp so we can create unique ids
+        timestamp = datetime.datetime.utcnow()
         # Parse markdown! FIXME: this probably can be easily exploited...
-        message = cls.parse_markdown(message)
+        message = cls.parse_markdown(timestamp, message)
 
         new_post = cls(
             name=name,
             tripcode=tripcode,
+            timestamp=timestamp,
             message=message,
             reply_to=reply_to,
         )
