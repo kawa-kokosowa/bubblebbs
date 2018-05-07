@@ -23,6 +23,17 @@ from . import config
 db = SQLAlchemy()
 
 
+class TripMeta(db.Model):
+    """Keeps track of tripcodes and postcount. Plus, if user
+    proves they know unhashed version of tripcode they can
+    set a Twitter URL, other links, a bio.
+
+    """
+
+    tripcode = db.Column(db.String(20), primary_key=True)
+    post_count = db.Column(db.Integer, default=0, nullable=False)
+
+
 # FIXME: bad schema...
 # TODO: tags
 class Post(db.Model):
@@ -181,9 +192,22 @@ class Post(db.Model):
         db.session.add(new_post)
         db.session.commit()
 
+        # increase postcount for tripcode
+        if tripcode:
+            trip_meta = db.session.query(TripMeta).get(tripcode)
+            if trip_meta:
+                trip_meta.post_count += 1
+            else:
+                new_trip_meta = TripMeta(
+                    tripcode=tripcode,
+                    post_count=1,
+                )
+                db.session.add(new_trip_meta)
+            db.session.commit()
+
         if reply_to:
             original = db.session.query(Post).get(reply_to)
-            original.bumptime = datetime.datetime.utcnow()
+            original.bumptime = timestamp
             db.session.commit()
 
         return new_post

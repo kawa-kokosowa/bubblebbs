@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}{{ tripcode }} (Trip Meta){% endblock %}
+
+{% block content %}
+<h2>Trip Meta for {{ trip_meta.tripcode }}</h2>
+<p>{{ trip_meta.post_count }} posts | <a href="/trip-meta/{{ trip_meta.tripcode }}/edit">Edit info</a></p>
+{{ trip_meta.bio | safe }}
+{% endblock %}

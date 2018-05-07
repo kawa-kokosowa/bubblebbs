@@ -17,3 +17,11 @@ class NewPostForm(FlaskForm):
     )
     message = TextAreaField('Message', validators=[DataRequired()])
     reply_to = HiddenField('reply_to')
+
+
+class TripMetaForm(FlaskForm):
+    bio = TextAreaField('Message', validators=[DataRequired()])
+    unhashed_tripcode = StringField(
+        'Unhashed Tripcode',
+        render_kw={'placeholder': 'tripcode'},
+    )

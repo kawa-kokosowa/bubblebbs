@@ -62,7 +62,7 @@ a:hover {
 
 #list-threads th,
 #list-threads td,
-#list-threads a {
+#list-threads .permalink {
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -87,6 +87,8 @@ a:hover {
   font-size: 0.8rem;
   line-height: 1.5rem;
   font-family: monospaced;
+  display: inline-block;
+  height: 1.5rem;
 }
 
 #list-threads td,
@@ -108,7 +110,7 @@ a:hover {
   background-color: var(--hard-yellow);
 }
 
-#list-threads a {
+#list-threads .permalink {
   line-height: 1.5rem;
   width: 100%;
   display: block;
@@ -117,7 +119,7 @@ a:hover {
   padding-left: 10px;
 }
 
-#list-threads a:hover {
+#list-threads .permalink:hover {
   background-color: var(--soft-yellow);
 }
 
@@ -407,7 +409,9 @@ fieldset input[type=submit] {
   color: var(--olive);
 }
 
-.tripcode {
+.tripcode,
+.tripcode:link,
+.tripcode:visited {
   color: var(--hard-grey);
 }
 
