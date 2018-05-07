@@ -32,6 +32,7 @@ class TripMeta(db.Model):
 
     tripcode = db.Column(db.String(20), primary_key=True)
     post_count = db.Column(db.Integer, default=0, nullable=False)
+    bio = db.Column(db.String(600))
 
 
 # FIXME: bad schema...
