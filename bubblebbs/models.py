@@ -76,6 +76,7 @@ class Post(db.Model):
     def parse_markdown(timestamp: str, message: str) -> str:
         # FIXME: review, pentest
         bleach = BleachExtension(
+            strip=True,
             tags=[
                 'h3',
                 'h4',

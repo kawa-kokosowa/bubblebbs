@@ -351,6 +351,14 @@ input[type=text] {
   font-family: 'Open Sans', sans-serif;
 }
 
+.op ul,
+.op ol,
+.reply ul,
+.reply ol {
+  list-style-type: inside;
+  margin: 1.5rem 40px;
+}
+
 textarea {
   background-color: var(--soft-grey);
   border: none;
