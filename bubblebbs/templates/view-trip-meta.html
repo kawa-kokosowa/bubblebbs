@@ -2,7 +2,33 @@
 {% block title %}{{ tripcode }} (Trip Meta){% endblock %}
 
 {% block content %}
-<h2>Trip Meta for {{ trip_meta.tripcode }}</h2>
-<p>{{ trip_meta.post_count }} posts | <a href="/trip-meta/{{ trip_meta.tripcode }}/edit">Edit info</a></p>
-{{ trip_meta.bio | safe }}
+
+<div class="stdpadding page">
+    <header>
+        <h2>Trip Meta for {{ trip_meta.tripcode }}</h2>
+        <p>{{ trip_meta.post_count }} posts | <a href="/trip-meta/{{ trip_meta.tripcode }}/edit">Edit info</a></p>
+    </header>
+    {{ trip_meta.bio | safe }}
+</div>
+
+<table id="list-threads">
+    <thead>
+        <tr>
+            <th class="list-message">Message</th>
+            <th class="list-author">Author</th>
+            <th class="list-bump">Bump</th>
+            <th class="list-replies">Replies</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for post in posts %}
+        <tr>
+            <td class="list-message">{{ thread_permalink_summary(post) }}</td>
+            <td class="list-author">{{ post_name(post) }}</td>
+            <td class="list-bump">{{ since_bumptime(post.bumptime) | safe }}</td>
+            <td class="list-replies">{{ post.reply_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

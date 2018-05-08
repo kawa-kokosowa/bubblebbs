@@ -156,6 +156,7 @@ a:hover {
   background-color: var(--mint-green);
 }
 
+.page header,
 .op header {
   background-color: var(--soft-yellow);
   font-weight: bold;
@@ -199,6 +200,8 @@ h3 {
   margin-top: 2.25rem;
 }
 
+
+.page header h2,
 .op header h2 {
   margin: 0;
 }
@@ -236,6 +239,7 @@ legend {
 .search-box input[type=text] {
 }
 
+.page:before,
 .op:before {
   display: block;
   clear: both;
@@ -453,6 +457,10 @@ th.replies {
 #list-threads td,
 #list-threads th {
   line-height: 1.5rem;
+}
+
+.stdpadding {
+  padding: 0 20px 1.5rem 20px;
 }
 
 @media screen and (max-width: 600px)
