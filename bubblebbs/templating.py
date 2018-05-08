@@ -21,8 +21,10 @@ def since_bumptime(bumptime):
     very_readable = ', '.join(parts)
     if not very_readable:
         very_readable = 'now'
+
+    datetime_w3c_spec = str(bumptime)[:-3]
     return '''
     <time datetime="{bumptime}" title="{bumptime}">
     {parts}
     </time>
-    '''.format(bumptime=bumptime, parts=very_readable)
+    '''.format(bumptime=datetime_w3c_spec, parts=very_readable)
