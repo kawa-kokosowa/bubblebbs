@@ -55,6 +55,10 @@ a:hover {
   width: 100%;
 }
 
+#list-threads th.list-replies {
+  padding-right: 10px;
+}
+
 #list-threads td {
   white-space: nowrap;
 }
@@ -437,6 +441,11 @@ th.message {
 
 th.replies {
   padding-right: 10px;
+}
+
+#list-threads td,
+#list-threads th {
+  line-height: 1.5rem;
 }
 
 @media screen and (max-width: 600px)

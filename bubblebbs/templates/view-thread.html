@@ -7,7 +7,7 @@
     <article class="op">
         <header>
             <h2>Thread #{{ post.id }} by {{ post_name(post) }}</h2>
-            <p class="meta"><time>{{ post.timestamp }}</time></p>
+            <p class="meta">{{ since_bumptime(post.bumptime) | safe }} ago</p>
         </header>
         <p class="message">{{ post.message | safe }}</p>
     </article>
@@ -16,7 +16,7 @@
           <div class="reply" id="{{ reply.id }}">
             <h3>#{{ reply.id }}</h3>
             <p class="message">{{ reply.message | safe }}</p>
-            <div class="meta">{{ post_name(reply) }} at {{ reply.timestamp }}</div>
+            <div class="meta">{{ post_name(reply) }}, {{ since_bumptime(reply.timestamp) | safe }} ago</div>
           </div>
       {% endfor %}
 

@@ -13,10 +13,12 @@ from . import forms
 from . import config
 from . import models
 from . import moderate
+from . import templating
 
 
 app = Flask(__name__)
 app.config.from_object(config)
+app.jinja_env.globals.update(since_bumptime=templating.since_bumptime)
 limiter = Limiter(
     app,
     key_func=get_remote_address,
