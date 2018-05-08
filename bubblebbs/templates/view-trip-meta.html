@@ -16,8 +16,7 @@
         <tr>
             <th class="list-message">Message</th>
             <th class="list-author">Author</th>
-            <th class="list-bump">Bump</th>
-            <th class="list-replies">Replies</th>
+            <th class="list-bump">Timestamp</th>
         </tr>
     </thead>
     <tbody>
@@ -25,8 +24,7 @@
         <tr>
             <td class="list-message">{{ thread_permalink_summary(post) }}</td>
             <td class="list-author">{{ post_name(post) }}</td>
-            <td class="list-bump">{{ since_bumptime(post.bumptime) | safe }}</td>
-            <td class="list-replies">{{ post.reply_count }}</td>
+            <td class="list-bump">{{ since_bumptime(post.timestamp) | safe }}</td>
         </tr>
         {% endfor %}
     </tbody>
