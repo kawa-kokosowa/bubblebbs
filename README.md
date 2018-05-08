@@ -5,8 +5,7 @@ Status](https://travis-ci.org/lily-mayfield/bubblebbs.svg?branch=master)](https:
 
 Text BBS/message board.
 
-This project is in alpha. It is currently unversioned and very messy. It lacks
-basic features like limiting, captcha, etc.
+This project is in alpha. It is currently unversioned and very messy.
 
 ## General technical
 
