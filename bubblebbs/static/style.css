@@ -357,6 +357,8 @@ input[type=text] {
 
 .op ul,
 .op ol,
+.page ul,
+.page ol,
 .reply ul,
 .reply ol {
   list-style-type: inside;
