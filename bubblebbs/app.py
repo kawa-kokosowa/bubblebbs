@@ -172,7 +172,12 @@ def new_reply():
 @app.route('/trip-meta/<path:tripcode>')
 def view_trip_meta(tripcode: str):
     trip_meta = models.db.session.query(models.TripMeta).get(tripcode)
-    posts_by_trip = models.db.session.query(models.Post).filter(models.Post.tripcode == tripcode).all()
+    posts_by_trip = (
+        models.db.session.query(models.Post)
+        .filter(models.Post.tripcode == tripcode)
+        .order_by(models.Post.timestamp.desc())
+        .all()
+    )
     return render_template('view-trip-meta.html', trip_meta=trip_meta, posts=posts_by_trip)
 
 
