@@ -41,7 +41,7 @@ a {
 }
 
 a:hover {
-  background-color: var(--olive-green);
+  background-color: var(--soft-yellow);
 }
 
 .whitebg {
@@ -109,10 +109,6 @@ a:hover {
   line-height: 3rem;
   height: 3rem;
   padding-left: 10px;
-}
-
-#list-threads .permalink:hover {
-  background-color: var(--soft-yellow);
 }
 
 #list-threads {
@@ -426,7 +422,7 @@ input[type=submit] {
 
 input[type=submit]:hover {
   text-decoration: underline;
-  background-color: var(--olive-green);
+  background-color: var(--soft-yellow);
 }
 
 fieldset input[type=submit] {
