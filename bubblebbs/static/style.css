@@ -36,7 +36,8 @@ ul ul {
   margin-left: 20px!important;
 }
 
-.op h1 {
+.op h1,
+.page h1 {
   font-size: 1.5rem;
 }
 

@@ -3,13 +3,13 @@
 
 {% block content %}
 
-<div class="stdpadding page">
+<article class="stdpadding page">
     <header>
         <h1>Trip Meta for <span class="tripcode">{{ trip_meta.tripcode }}</span></h1>
         <p>{{ trip_meta.post_count }} posts | <a href="/trip-meta/{{ trip_meta.tripcode }}/edit">Edit info</a></p>
     </header>
     {{ trip_meta.bio | safe }}
-</div>
+</article>
 
 <table id="list-threads">
     <thead>
