@@ -89,6 +89,7 @@ class Post(db.Model):
                 'li',
                 'code',
                 'sup',
+                'pre',
                 'br',
                 'a',
                 'p',
