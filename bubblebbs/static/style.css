@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans');
+ @import url('https://fonts.googleapis.com/css?family=Roboto+Mono');
 
 * {margin:0;padding:0;box-sizing:border-box;}
 
@@ -183,6 +184,10 @@ a:hover {
   font-style: italic;
   font-size: 0.875rem;
   line-height: 1.5rem;
+}
+
+.tripcode {
+  font-family: 'Roboto Mono', monospace;
 }
 
 .page h2 span.tripcode {
