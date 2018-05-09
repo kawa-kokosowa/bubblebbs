@@ -1,5 +1,5 @@
 {% macro thread_permalink_summary(post) -%}
-    <a href="/threads/{% if post.reply_to %}{{ post.reply_to }}#{% endif %}{{ post.id }}" class="permalink">#{{ post.id }}: {{ post.message[:140] | striptags }}</a>
+    <a href="/threads/{% if post.reply_to %}{{ post.reply_to }}#{% endif %}{{ post.id }}" class="permalink">#{{ post.id }}: {{ post.message[:140] | striptags }}{% if post.message[140:] %}&hellip;{% endif %}</a>
 {%- endmacro %}
 {% macro post_name(post) -%}
     {% if post.name %}{{ post.name }}{% if post.tripcode %}<a href="/trip-meta/{{ post.tripcode }}" class="tripcode">#{{ post.tripcode }}</a>{% endif %}{% else %}Anonymous{% endif %}
