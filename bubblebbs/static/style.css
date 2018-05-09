@@ -81,7 +81,6 @@ a:hover {
 }
 
 #list-threads .tripcode {
-  font-size: 0.8rem;
   display: inline;
 }
 
@@ -169,8 +168,7 @@ a:hover {
   font-size: 1rem;
 }
 
-.op .tripcode {
-  font-size: 0.75rem;
+.tripcode {
   font-weight: normal;
   text-transform: none;
 }
@@ -456,7 +454,6 @@ fieldset input[type=submit] {
 .tripcode,
 .tripcode:link,
 .tripcode:visited {
-  color: var(--hard-grey);
 }
 
 .search-input,
