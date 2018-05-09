@@ -6,6 +6,10 @@ def get_pages():
     return models.db.session.query(models.Page).all()
 
 
+def get_blotter_entries():
+    return models.BlotterEntry.query.order_by(models.BlotterEntry.id.desc()).all()
+
+
 def since_bumptime(bumptime):
     total_seconds = int((bumptime.now() - bumptime).total_seconds())
     days, seconds = divmod(total_seconds, 86400)

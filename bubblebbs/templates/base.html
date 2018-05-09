@@ -20,7 +20,7 @@
   <p>{{ config_db('site_tagline') | safe }}</p>
   <div class="blotter">
     <ul>
-    {% for entry in blotter_entries %}
+    {% for entry in get_blotter_entries() %}
       <li>{{ entry.timestamp }}: {{ entry.text }}</li>
     {% endfor %}
     </ul>

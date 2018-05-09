@@ -18,7 +18,11 @@ from . import templating
 
 app = Flask(__name__)
 app.config.from_object(config)
-app.jinja_env.globals.update(since_bumptime=templating.since_bumptime, get_pages=templating.get_pages)  # why not move this to templating?
+app.jinja_env.globals.update(
+    since_bumptime=templating.since_bumptime,
+    get_pages=templating.get_pages,
+    get_blotter_entries=templating.get_blotter_entries,
+)  # why not move this to templating?
 limiter = Limiter(
     app,
     key_func=get_remote_address,
@@ -82,7 +86,6 @@ def board_index():
         'list.html',
         form=forms.NewPostForm(),
         posts=posts,
-        blotter_entries=get_blotter_entries(),
     )
 
 
@@ -117,7 +120,6 @@ def view_specific_post(post_id: int):
             form=form,
             post=post,
             replies=replies,
-            blotter_entries=get_blotter_entries(),
         )
 
 
@@ -263,11 +265,6 @@ def new_thread():
         return render_template('errors.html', errors=errors), 400
 
 
-def get_blotter_entries():
-    return models.BlotterEntry.query.order_by(models.BlotterEntry.id.desc()).all()
-
-
-# should go later in app factory...
 with app.app_context():
     # Make it so can access config db from template
     app.jinja_env.globals.update(config_db=config_db)
