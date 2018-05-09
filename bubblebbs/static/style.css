@@ -296,7 +296,7 @@ sup:target {
 }
 
 .reply h3:before {
-  content: '\2bb9';
+  content: '\21b0';
   color: var(--olive-green);
   font-size: 1.5rem;
   line-height: 1rem;
