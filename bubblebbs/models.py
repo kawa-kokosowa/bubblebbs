@@ -125,6 +125,7 @@ class Post(db.Model):
                 'markdown.extensions.toc',
                 'markdown.extensions.def_list',
                 'markdown.extensions.abbr',
+                'markdown.extensions.fenced_code_blocks',
             ],
         )
         return md.convert(message)
