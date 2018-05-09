@@ -299,7 +299,7 @@ sup:target {
 }
 
 .reply h3:before {
-  content: '\21b0';
+  content: '\21aa';
   color: var(--olive-green);
   font-size: 1.5rem;
   line-height: 1rem;
