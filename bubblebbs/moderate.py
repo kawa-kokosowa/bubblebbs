@@ -106,6 +106,12 @@ class PageModelView(MyModelView):
         },
     )
 
+    def _page_body(view, context, model, name):
+        return Markup(models.Post.parse_markdown(model.slug, model.body))
+    column_formatters = {
+        'body': _page_body,
+    }
+
     def create_form(self):
         form = super(MyModelView, self).create_form()
         if ('source') in request.args.keys():
