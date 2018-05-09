@@ -176,6 +176,9 @@ a:hover {
 }
 
 #actions {
+  display: block;
+  height: 3rem;
+  width: 100%;
   padding: 0;
   line-height: 3rem;
 }
@@ -187,6 +190,10 @@ a:hover {
 
 #actions ul {
   list-style-type: none;
+  display: block;
+  box-sizing: border-box;
+  float: left;
+  width: 66.66%;
 }
 
 #actions li {
@@ -299,10 +306,10 @@ legend {
 }
 
 .search-box {
+  box-sizing: border-box;
+  width: 33.33%;
   float: right;
-}
-
-.search-box input[type=text] {
+  display: block;
 }
 
 .page:before,
@@ -517,8 +524,13 @@ fieldset input[type=submit] {
 .tripcode:visited {
 }
 
+.search-submit {
+  width: 33.33%;
+}
+
 .search-input,
 .search-submit {
+  box-sizing: border-box;
   float: left;
   display: block;
   margin: 0 !important;
@@ -531,6 +543,7 @@ fieldset input[type=submit] {
   line-height: 1.5rem;
   height: 1.5rem;
   border: none;
+  width: 66.66%;
   padding: 0 10px;
   background-color: var(--soft-grey);
 }
@@ -561,12 +574,25 @@ th.replies {
   padding: 0 20px 1.5rem 20px;
 }
 
-@media screen and (max-width: 600px)
+@media screen and (max-width: 700px)
 {
   html,
   body {
     font-size: 12px;
     padding: 0;
+  }
+
+  #actions {
+    font-size: 10px;
+  }
+
+  #actions li + li:before {
+    padding: 5;
+  }
+
+  #actions .search-box,
+  #actions ul {
+    width: 100%;
   }
 
   #list-threads {
