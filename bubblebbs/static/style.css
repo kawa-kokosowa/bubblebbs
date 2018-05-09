@@ -195,6 +195,7 @@ a:hover {
 }
 
 pre {
+  overflow-x: scroll;
   background-color: var(--soft-grey);
   display: block;
   padding: 0.75rem 10px;
