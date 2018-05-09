@@ -195,11 +195,13 @@ def edit_trip_meta(tripcode: str):
     trip_meta_form = forms.TripMetaForm()
 
     if request.method == 'GET':
+        trip_meta_form.bio.data = models.db.session.query(models.TripMeta).get(tripcode).bio_source
         return render_template('edit-trip-meta.html', form=trip_meta_form, tripcode=tripcode)
     elif (request.method == 'POST'
           and trip_meta_form.validate_on_submit()
           and models.Post.make_tripcode('lol#' + trip_meta_form.unhashed_tripcode.data)[1] == tripcode):
         trip_meta = models.db.session.query(models.TripMeta).get(tripcode)
+        trip_meta.bio_source = trip_meta_form.bio.data
         trip_meta.bio = models.Post.parse_markdown('', trip_meta_form.bio.data)
         models.db.session.commit()
         return redirect(url_for('view_trip_meta', tripcode=tripcode))
