@@ -194,6 +194,11 @@ a:hover {
   float: left;
 }
 
+pre {
+  background-color: var(--soft-grey);
+  display: block;
+}
+
 #actions li + li:before {
   content: '\25CD';
   color: var(--olive-green);
