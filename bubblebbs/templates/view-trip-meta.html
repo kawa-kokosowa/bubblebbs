@@ -5,7 +5,7 @@
 
 <div class="stdpadding page">
     <header>
-        <h2>Trip Meta for {{ trip_meta.tripcode }}</h2>
+        <h2>Trip Meta for <span class="tripcode">{{ trip_meta.tripcode }}</span></h2>
         <p>{{ trip_meta.post_count }} posts | <a href="/trip-meta/{{ trip_meta.tripcode }}/edit">Edit info</a></p>
     </header>
     {{ trip_meta.bio | safe }}

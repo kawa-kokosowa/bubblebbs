@@ -171,7 +171,6 @@ a:hover {
 .op .tripcode {
   font-size: 0.75rem;
   font-weight: normal;
-  font-family: monospaced;
   text-transform: none;
 }
 
@@ -184,6 +183,11 @@ a:hover {
   font-style: italic;
   font-size: 0.875rem;
   line-height: 1.5rem;
+}
+
+.page h2 span.tripcode {
+  text-transform: none;
+  color: #000;
 }
 
 .brand h1 {

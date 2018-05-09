@@ -147,7 +147,7 @@ class Post(db.Model):
             base64.b64encode(
                 scrypt.hash(unhashed_tripcode, config.SECRET_KEY),
             ),
-        )[2:22].replace('/', '_')
+        )[2:22].replace('/', '-')
         return name, tripcode
 
     @staticmethod
