@@ -5,3 +5,4 @@ __pycache__
 *.db
 bubblebbs/*.db
 .env-file
+dump.rdb

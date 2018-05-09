@@ -9,13 +9,13 @@
             <h2>Thread #{{ post.id }} by {{ post_name(post) }}</h2>
             <p class="meta">{{ since_bumptime(post.bumptime) | safe }} ago</p>
         </header>
-        <p class="message">{{ post.message | safe }}</p>
+        <div class="message">{{ post.message | safe }}</div>
     </article>
 
       {% for reply in replies %}
           <div class="reply" id="{{ reply.id }}">
             <h3>#{{ reply.id }}</h3>
-            <p class="message">{{ reply.message | safe }}</p>
+            <div class="message">{{ reply.message | safe }}</div>
             <div class="meta">{{ post_name(reply) }}, {{ since_bumptime(reply.timestamp) | safe }} ago</div>
           </div>
       {% endfor %}

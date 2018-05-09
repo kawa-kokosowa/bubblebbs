@@ -12,6 +12,7 @@ import scrypt
 import markdown
 from mdx_bleach.extension import BleachExtension
 from markdown.extensions.footnotes import FootnoteExtension
+from markdown.extensions.smarty import SmartyExtension
 from markdown.extensions.wikilinks import WikiLinkExtension
 from jinja2 import Markup
 from flask_sqlalchemy import SQLAlchemy
@@ -63,11 +64,10 @@ class Post(db.Model):
     def reference_links(message: str, thread_id: int) -> str:
         """Parse >>id links"""
 
-        sanitized_message = str(Markup.escape(message))
-        pattern = re.compile('\&gt\;\&gt\;([0-9]+)')
+        pattern = re.compile('\>\>([0-9]+)')
         message_with_links = pattern.sub(
             r'<a href="/threads/%d#\1">&gt;&gt;\1</a>' % thread_id,
-            sanitized_message,
+            message,
         )
         return message_with_links
 
@@ -82,6 +82,7 @@ class Post(db.Model):
                 'h4',
                 'h5',
                 'h6',
+                'blockquote',
                 'ul',
                 'ol',
                 'li',
@@ -111,6 +112,12 @@ class Post(db.Model):
         md = markdown.Markdown(
             extensions=[
                 bleach,
+                SmartyExtension(
+                    smart_dashes=True,
+                    smart_quotes=True,
+                    smart_ellipses=True,
+                    substitutions={},
+                ),
                 'markdown.extensions.nl2br',
                 'markdown.extensions.footnotes',
                 'markdown.extensions.toc',
@@ -172,13 +179,13 @@ class Post(db.Model):
             name = form.name.data
             tripcode = None
 
+        message = form.message.data
         # message link
         try:
             reply_to = int(form.reply_to.data)
-            message = cls.reference_links(form.message.data, reply_to)
+            message = cls.reference_links(message, reply_to)
         except (ValueError, AttributeError) as e:
             reply_to = None
-            message = form.message.data
 
         # manually generate the timestamp so we can create unique ids
         timestamp = datetime.datetime.utcnow()

@@ -365,6 +365,35 @@ input[type=text] {
   margin: 1.5rem 40px;
 }
 
+.markdown-container {
+
+}
+
+blockquote {
+  margin: 1.5rem 0 1.5rem 3rem;
+  font-style: italic;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+blockquote:before {
+  color: var(--hard-grey);
+  content: '\201C';
+  font-size: 3rem;
+  display: block;
+  max-width: 2rem;
+  float: left;
+  margin-left: -2rem;
+
+  font-family: serif;
+
+  font-size: 4em;
+}
+
+code {
+  background-color: var(--soft-grey);
+}
+
 textarea {
   background-color: var(--soft-grey);
   border: none;
