@@ -36,6 +36,18 @@ ul ul {
   margin-left: 20px!important;
 }
 
+dl {
+  margin: 1.5rem 0;
+}
+
+dt {
+  font-weight: bold;
+}
+
+dd {
+  margin-left: 20px;
+}
+
 .op h1,
 .page h1 {
   font-size: 1.5rem;
