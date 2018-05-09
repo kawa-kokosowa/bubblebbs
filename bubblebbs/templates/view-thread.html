@@ -4,21 +4,26 @@
 {% block content %}
 
 <div class="thread">
-    <article class="op">
-        <header>
-            <h2>Thread #{{ post.id }} by {{ post_name(post) }}</h2>
-            <p class="meta">{{ since_bumptime(post.bumptime) | safe }} ago</p>
-        </header>
-        <div class="message">{{ post.message | safe }}</div>
-    </article>
+    <article>
+        <section class="op">
+            <header>
+                <h1>Thread #{{ post.id }} by {{ post_name(post) }}</h1>
+                <p class="meta">{{ since_bumptime(post.bumptime) | safe }} ago</p>
+            </header>
+            <div class="message">{{ post.message | safe }}</div>
+        </section>
 
+      <section class="replies">
       {% for reply in replies %}
-          <div class="reply" id="{{ reply.id }}">
-            <h3>#{{ reply.id }}</h3>
+          <article class="reply" id="{{ reply.id }}">
+            <header>
+                <h1>Reply #{{ reply.id }} by {{ post_name(reply) }}</h1>
+                <p class="meta">{{ since_bumptime(reply.timestamp) | safe }} ago</p>
+            </header>
             <div class="message">{{ reply.message | safe }}</div>
-            <div class="meta">{{ post_name(reply) }}, {{ since_bumptime(reply.timestamp) | safe }} ago</div>
-          </div>
+          </article>
       {% endfor %}
+      </section>
 
     <form action="/replies/new" method="POST" enctype="multipart/form-data">
       <fieldset>

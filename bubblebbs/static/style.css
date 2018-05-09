@@ -30,6 +30,64 @@ body {
   margin: 0;
 }
 
+ol ol,
+ul ul {
+  margin: 0!important;
+  margin-left: 20px!important;
+}
+
+.op h1 {
+  font-size: 1.5rem;
+}
+
+.reply h1 {
+  font-size: 1.4rem;
+}
+
+.reply header {
+  margin-bottom: 1.5rem;
+}
+
+.reply .meta {
+  font-size: 0.9rem;
+  color: #000;
+}
+
+.reply h2,
+.op h2 {
+  font-size: 1.25rem;
+}
+
+.reply h3,
+.op h3 {
+  text-transform: uppercase;
+  font-size: 1.23rem;
+  margin-top: 2.20rem;
+  font-size: 1.20rem;
+}
+
+.op h4,
+.reply h4 {
+  margin: 1.5rem 0;
+  font-size: 1.14rem;
+}
+
+.reply h5,
+.op h5 {
+  font-size: 1rem;
+  margin: 1.5rem 0;
+  text-transform: uppercase;
+}
+
+.op h6,
+.reply h6 {
+  margin-bottom: 0.75rem;
+  margin-top: 2.25rem;
+  font-style: italic;
+  font-size: 1rem;
+  font-weight: normal;
+}
+
 body {
   padding: 1.5rem 20px;
 }
@@ -184,7 +242,7 @@ a:hover {
   font-family: 'Roboto Mono', monospace;
 }
 
-.page h2 span.tripcode {
+.page h1 span.tripcode {
   text-transform: none;
 }
 
@@ -196,6 +254,7 @@ a:hover {
   padding: 0 20px;
 }
 
+article h1,
 h2,
 h3 {
   margin-bottom: 0.75rem;
@@ -203,8 +262,8 @@ h3 {
 }
 
 
-.page header h2,
-.op header h2 {
+.page header h1,
+.op header h1 {
   margin: 0;
 }
 
@@ -253,7 +312,7 @@ legend {
 .reply header,
 .op header,
 .reply + .op ,
-.op header h2, {
+.op header h1, {
   margin: 0;
   min-width: 0;
 }
@@ -282,7 +341,7 @@ header {
 header p {
 }
 
-.reply h3 {
+.reply h1 {
   margin: 0;
   padding:0
 }
@@ -297,12 +356,14 @@ sup:target {
   border: 1px solid #ff0000;
 }
 
-.reply h3:before {
+.reply h1:before {
   content: '\21aa';
-  color: var(--olive-green);
+  color: var(--mint-green);
   font-size: 1.5rem;
-  line-height: 1rem;
+  line-height: 1.5rem;
   padding-right: 10px;
+  margin-left: -30px;
+  position: absolute;
 }
 
 .page-footer {

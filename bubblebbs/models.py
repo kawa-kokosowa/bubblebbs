@@ -78,6 +78,7 @@ class Post(db.Model):
         bleach = BleachExtension(
             strip=True,
             tags=[
+                'h2',
                 'h3',
                 'h4',
                 'h5',
@@ -96,6 +97,7 @@ class Post(db.Model):
             ],
             attributes={
                 '*': [],
+                'h2': ['id'],
                 'h3': ['id'],
                 'h4': ['id'],
                 'h5': ['id'],
