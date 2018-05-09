@@ -3,6 +3,7 @@
 import os
 import string
 import random
+import typing
 
 from flask import Flask, url_for, redirect, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -91,6 +92,30 @@ class MyModelView(sqla.ModelView):
 
     def is_accessible(self):
         return login.current_user.is_authenticated
+
+
+class PageModelView(MyModelView):
+    column_display_pk = True
+    form_columns = ('title', 'slug', 'source')
+    form_overrides = dict(
+        source=fields.TextAreaField,
+    )
+    form_widget_args = dict(
+        source={
+            'placeholder': 'Enter new contents with markdown',
+        },
+    )
+
+    def create_form(self):
+        form = super(MyModelView, self).create_form()
+        if ('source') in request.args.keys():
+            source = self.session.query(models.Page).filter(Page.slug == request.args['slug']).one()
+            form.source.data = source
+        return form 
+
+    @staticmethod
+    def on_model_change(form, model, is_created):
+        model.body = models.Post.parse_markdown('page', model.source)
 
 
 class AdminUserModelView(MyModelView):

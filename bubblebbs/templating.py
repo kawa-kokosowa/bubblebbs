@@ -1,3 +1,11 @@
+# TODO: move all the model stuff that's templating into here
+from . import models
+
+
+def get_pages():
+    return models.db.session.query(models.Page).all()
+
+
 def since_bumptime(bumptime):
     total_seconds = int((bumptime.now() - bumptime).total_seconds())
     days, seconds = divmod(total_seconds, 86400)

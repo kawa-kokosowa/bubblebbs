@@ -223,6 +223,19 @@ class Post(db.Model):
         return new_post
 
 
+class Page(db.Model):
+    __tablename__ = 'pages'
+    slug = db.Column(db.String(60), primary_key=True)
+    title = db.Column(db.String(200))
+    body = db.Column(db.String(1000))
+    source = db.Column(db.String(700))
+
+    @classmethod
+    def from_form(cls, form):
+        body = Post.parse_markdown('lol', form.source.data)
+        return cls(body=body, slug=form.slug.data, source=form.body.data)
+
+
 # Create user model.
 # TODO: rename admin?
 class User(db.Model):

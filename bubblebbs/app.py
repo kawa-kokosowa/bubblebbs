@@ -18,11 +18,11 @@ from . import templating
 
 app = Flask(__name__)
 app.config.from_object(config)
-app.jinja_env.globals.update(since_bumptime=templating.since_bumptime)
+app.jinja_env.globals.update(since_bumptime=templating.since_bumptime, get_pages=templating.get_pages)  # why not move this to templating?
 limiter = Limiter(
     app,
     key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"]
+    default_limits=["400 per day", "100 per hour"]
 )
 
 
@@ -169,6 +169,12 @@ def new_reply():
     return render_template('errors.html', errors=errors), 400
 
 
+@app.route('/pages/<slug>')
+def view_page(slug: str):
+    page = models.db.session.query(models.Page).get(slug)
+    return render_template('page.html', page=page)
+
+
 @app.route('/trip-meta/<path:tripcode>')
 def view_trip_meta(tripcode: str):
     trip_meta = models.db.session.query(models.TripMeta).get(tripcode)
@@ -277,6 +283,7 @@ with app.app_context():
     admin_.add_view(moderate.MyModelView(models.Post, models.db.session))
     admin_.add_view(moderate.MyModelView(models.Ban, models.db.session))
     admin_.add_view(moderate.MyModelView(models.BlotterEntry, models.db.session))
+    admin_.add_view(moderate.PageModelView(models.Page, models.db.session))
     admin_.add_view(moderate.ConfigView(models.ConfigPair, models.db.session))
 
     models.db.init_app(app)
