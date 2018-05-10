@@ -1,6 +1,6 @@
 # TODO: CSRF Protection and validation
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, HiddenField
+from wtforms import StringField, TextAreaField, HiddenField, BooleanField
 from wtforms.validators import DataRequired, Email
 from flask_wtf.file import FileField, FileRequired
 from werkzeug.utils import secure_filename
@@ -17,6 +17,7 @@ class NewPostForm(FlaskForm):
     )
     message = TextAreaField('Message', validators=[DataRequired()])
     reply_to = HiddenField('reply_to')
+    sage = BooleanField()
 
 
 class TripMetaForm(FlaskForm):

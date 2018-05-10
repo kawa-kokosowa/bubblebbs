@@ -223,7 +223,7 @@ class Post(db.Model):
                 db.session.add(new_trip_meta)
             db.session.commit()
 
-        if reply_to:
+        if reply_to and not form.sage.data:
             original = db.session.query(Post).get(reply_to)
             original.bumptime = timestamp
             db.session.commit()
