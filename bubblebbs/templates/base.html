@@ -4,6 +4,9 @@
 {% macro post_name(post) -%}
     {% if post.name %}{{ post.name }}{% if post.tripcode %}<a href="/trip-meta/{{ post.tripcode }}" class="tripcode">#{{ post.tripcode }}</a>{% endif %}{% else %}Anonymous{% endif %}
 {%- endmacro %}
+{% macro post_name_summarized(post) -%}
+    {% if post.name %}{% if post.tripcode %}<a href="/trip-meta/{{ post.tripcode }}" class="tripcode">{{ post.name }}</a>{% else %}{{ post.name }}{% endif %}{% else %}Anonymous{% endif %}
+{%- endmacro %}
 <!DOCTYPE html>
 <html lang="en">
 <head>

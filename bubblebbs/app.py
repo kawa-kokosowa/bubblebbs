@@ -51,8 +51,8 @@ def search_json():
 
 @app.route("/", methods=['GET'])
 @limiter.limit("45 per minute")
-def board_index():
-    """View threads by bumptime.
+def list_threads():
+    """View threads by bumptime in a list.
 
     """
 
@@ -75,12 +75,12 @@ def board_index():
         )
 
     for post in posts:
-        reply_count = (
+        reply_query = (
             models.Post.query
             .filter(models.Post.reply_to == post.id)
-            .count()
         )
-        post.reply_count = reply_count
+        post.reply_count = reply_query.count()
+        post.last_reply = reply_query.order_by(models.Post.bumptime.desc()).first()
 
     return render_template(
         'list.html',
