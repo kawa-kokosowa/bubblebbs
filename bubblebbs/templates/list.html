@@ -7,7 +7,8 @@
         <tr>
             <th class="list-message">Message</th>
             <th class="list-author">Author</th>
-            <th class="list-bump">Bump</th>
+            <th class="list-bump">Bumptime</th>
+            <th class="list-last">Last Reply</th>
             <th class="list-replies">Replies</th>
         </tr>
     </thead>
@@ -16,7 +17,8 @@
         <tr>
             <td class="list-message">{{ thread_permalink_summary(post) }}</td>
             <td class="list-author">{{ post_name(post) }}</td>
-            <td class="list-bump">{% if post.last_reply %}<a href="/threads/{{ post.last_reply.reply_to}}#{{ post.last_reply.id }}">#{{ post.last_reply.id }}</a> by {{ post_name_summarized(post.last_reply) }}, {%endif %}{{ since_bumptime(post.bumptime) | safe }} ago</td>
+            <td class="list-bump">{{ since_bumptime(post.bumptime) | safe }} ago</td>
+            <td class="list-last">{% if post.last_reply %}<a href="/threads/{{ post.last_reply.reply_to}}#{{ post.last_reply.id }}">#{{ post.last_reply.id }}</a> by {{ post_name_summarized(post.last_reply) }}{%endif %}</td>
             <td class="list-replies">{{ post.reply_count }}</td>
         </tr>
         {% endfor %}
