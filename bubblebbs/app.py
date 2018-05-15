@@ -9,6 +9,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from colorhash import ColorHash
+from pymojihash.pymojihash import hash_to_emoji
 
 from . import forms
 from . import config
@@ -22,6 +23,7 @@ app.config.from_object(config)
 app.jinja_env.globals.update(
     since_bumptime=templating.since_bumptime,
     get_pages=templating.get_pages,
+    hash_to_emoji=hash_to_emoji,
     color_hash=ColorHash,
     get_blotter_entries=templating.get_blotter_entries,
 )  # why not move this to templating?
