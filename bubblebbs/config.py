@@ -8,5 +8,5 @@ SITE_FOOTER = os.environ.get(
     'BBBS_SITE_FOOTER',
     '<a href="https://github.com/lily-mayfield/bubblebbs">Powered by BubbleBBS</a>',
 )
-RATELIMIT_STORAGE_URL = os.environ.get('BBS_RATELIMIT_STORAGE_URL', 'redis://localhost:6379/1')
-SECRET_KEY = os.environ.get('BBS_SECRET_KEY', 'CHANGEME')
+RATELIMIT_STORAGE_URL = os.environ.get('BBBS_RATELIMIT_STORAGE_URL', 'redis://localhost:6379/1')
+SECRET_KEY = os.environ.get('BBBS_SECRET_KEY', 'CHANGEME')
