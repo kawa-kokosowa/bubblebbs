@@ -19,7 +19,7 @@
             <td class="list-author">{{ post_name(post) }}</td>
             <td class="list-bump">{{ since_bumptime(post.bumptime) | safe }} ago</td>
             <td class="list-last">{% if post.last_reply %}<a href="/threads/{{ post.last_reply.reply_to}}#{{ post.last_reply.id }}">#{{ post.last_reply.id }}</a> by {{ post_name_summarized(post.last_reply) }}{%endif %}</td>
-            <td class="list-replies">{{ post.reply_count }}</td>
+            <td class="list-replies">{{ post.reply_count }}{% if post.locked %}🔒{% endif %}</td>
         </tr>
         {% endfor %}
     </tbody>

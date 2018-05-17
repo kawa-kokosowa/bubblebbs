@@ -42,8 +42,8 @@ class TripMeta(db.Model):
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
-    subject = db.Column(db.String(120))
     name = db.Column(db.String(120))
+    locked = db.Column(db.Boolean(), default=False, nullable=False)
     tripcode = db.Column(db.String(64))
     message = db.Column(db.String(2000), nullable=False, unique=True)
     reply_to = db.Column(db.Integer, db.ForeignKey('posts.id'))
@@ -194,6 +194,9 @@ class Post(db.Model):
             message = cls.reference_links(message, reply_to)
         except (ValueError, AttributeError) as e:
             reply_to = None
+
+        if reply_to and db.session.query(Post).get(reply_to).locked:
+            raise Exception('This thread is locked. You cannot reply.')
 
         # manually generate the timestamp so we can create unique ids
         timestamp = datetime.datetime.utcnow()
