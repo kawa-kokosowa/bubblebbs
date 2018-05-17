@@ -10,7 +10,7 @@
                 <h1>Thread #{{ post.id }} by {{ post_name(post) }}</h1>
                 <p class="meta">{{ since_bumptime(post.bumptime) | safe }} ago</p>
             </header>
-            <div class="message">{{ post.message | safe }}</div>
+            <div class="message">{{ post.message | word_filter | safe }}</div>
         </section>
 
       <section class="replies">
@@ -20,7 +20,7 @@
                 <h1>Reply #{{ reply.id }} by {{ post_name(reply) }}</h1>
                 <p class="meta">{{ since_bumptime(reply.timestamp) | safe }} ago</p>
             </header>
-            <div class="message">{{ reply.message | safe }}</div>
+            <div class="message">{{ reply.message | word_filter | safe }}</div>
           </article>
       {% endfor %}
       </section>

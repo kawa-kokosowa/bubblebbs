@@ -141,6 +141,11 @@ class ConfigView(MyModelView):
     # how to disable create view..?
 
 
+class WordFilterView(MyModelView):
+    form_columns = ['find', 'replace']
+    column_list = ['find', 'replace']
+
+
 # Create customized index view class that handles login & registration
 class MyAdminIndexView(admin.AdminIndexView):
 

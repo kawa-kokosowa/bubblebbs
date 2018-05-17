@@ -27,6 +27,10 @@ app.jinja_env.globals.update(
     color_hash=ColorHash,
     get_blotter_entries=templating.get_blotter_entries,
 )  # why not move this to templating?
+app.jinja_env.filters = {
+    **app.jinja_env.filters,
+    'word_filter': templating.word_filter,
+}
 limiter = Limiter(
     app,
     key_func=get_remote_address,
@@ -288,6 +292,7 @@ with app.app_context():
     admin_.add_view(moderate.MyModelView(models.BlotterEntry, models.db.session))
     admin_.add_view(moderate.PageModelView(models.Page, models.db.session))
     admin_.add_view(moderate.ConfigView(models.ConfigPair, models.db.session))
+    admin_.add_view(moderate.WordFilterView(models.WordFilter, models.db.session))
 
     models.db.init_app(app)
     moderate.build_sample_db()

@@ -1,4 +1,6 @@
 # TODO: move all the model stuff that's templating into here
+import re
+
 from . import models
 
 
@@ -8,6 +10,14 @@ def get_pages():
 
 def get_blotter_entries():
     return models.BlotterEntry.query.order_by(models.BlotterEntry.id.desc()).all()
+
+
+def word_filter(message):
+    word_filters = models.db.session.query(models.WordFilter).all()
+    for word_filter in word_filters:
+        find = re.compile(re.escape(word_filter.find), re.IGNORECASE)
+        message = find.sub(word_filter.replace, message)
+    return message
 
 
 def since_bumptime(bumptime):

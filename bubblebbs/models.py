@@ -45,7 +45,7 @@ class Post(db.Model):
     subject = db.Column(db.String(120))
     name = db.Column(db.String(120))
     tripcode = db.Column(db.String(64))
-    message = db.Column(db.String(2000), nullable=False)
+    message = db.Column(db.String(2000), nullable=False, unique=True)
     reply_to = db.Column(db.Integer, db.ForeignKey('posts.id'))
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     bumptime = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
@@ -297,4 +297,9 @@ class BlotterEntry(db.Model):
 
 class ConfigPair(db.Model):
     key = db.Column(db.String(100), primary_key=True)
-    value = db.Column(db.String(1000))
+    value = db.Column(db.String(1000), nullable=False)
+
+
+class WordFilter(db.Model):
+    find = db.Column(db.String(100), primary_key=True)
+    replace = db.Column(db.String(1000), nullable=False)  # can be html
