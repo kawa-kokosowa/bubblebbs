@@ -15,7 +15,7 @@ def get_blotter_entries():
 def word_filter(message):
     word_filters = models.db.session.query(models.WordFilter).all()
     for word_filter in word_filters:
-        find = re.compile(re.escape(word_filter.find), re.IGNORECASE)
+        find = re.compile(r'\b' + re.escape(word_filter.find) + r'\b', re.IGNORECASE)
         message = find.sub(word_filter.replace, message)
     return message
 
