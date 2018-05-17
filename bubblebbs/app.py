@@ -25,6 +25,7 @@ app.jinja_env.globals.update(
     get_pages=templating.get_pages,
     hash_to_emoji=hash_to_emoji,
     color_hash=ColorHash,
+    complementary_color=templating.complementary_color,
     get_blotter_entries=templating.get_blotter_entries,
 )  # why not move this to templating?
 app.jinja_env.filters = {

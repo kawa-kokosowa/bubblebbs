@@ -2,10 +2,10 @@
     <a href="/threads/{% if post.reply_to %}{{ post.reply_to }}#{% endif %}{{ post.id }}" class="permalink">#{{ post.id }}: {{ post.message[:140] | safe | word_filter | striptags }}{% if post.message[140:] %}&hellip;{% endif %}</a>
 {%- endmacro %}
 {% macro post_name(post) -%}
-    {% if post.tripcode %}<a href="/trip-meta/{{ post.tripcode }}" class="tripcode" style="background-color: {{ color_hash(post.tripcode).hex }}">{{ post.name }}{{ hash_to_emoji(post.tripcode) }}</a>{% elif post.name %}{{ post.name }}{% else %}Anonymous{% endif %}
+    {% if post.tripcode %}<a href="/trip-meta/{{ post.tripcode }}" class="tripcode" style="background-color: {{ color_hash(post.tripcode).hex }}; color: #{{ complementary_color(color_hash(post.tripcode).hex) }}">{{ post.name }}<span class="tripcode-emoji">{{ hash_to_emoji(post.tripcode) }}</span></a>{% elif post.name %}{{ post.name }}{% else %}Anonymous{% endif %}
 {%- endmacro %}
 {% macro post_name_summarized(post) -%}
-    {% if post.tripcode %}<a href="/trip-meta/{{ post.tripcode }}" class="tripcode" style="background-color: {{ color_hash(post.tripcode).hex }}">{{ post.name }}{{ hash_to_emoji(post.tripcode) }}</a>{% elif post.name %}{{ post.name }}{% else %}Anonymous{% endif %}
+    {% if post.tripcode %}<a href="/trip-meta/{{ post.tripcode }}" class="tripcode" style="background-color: {{ color_hash(post.tripcode).hex }}; color: #{{ complementary_color(color_hash(post.tripcode).hex) }}">{{ post.name }}<span class="tripcode-emoji">{{ hash_to_emoji(post.tripcode) }}</span></a>{% elif post.name %}{{ post.name }}{% else %}Anonymous{% endif %}
 {%- endmacro %}
 <!DOCTYPE html>
 <html lang="en">

@@ -34,6 +34,10 @@ body {
   /* idk what to do with it rn */
 }
 
+.tripcode-emoji {
+  background-color: #fff;
+}
+
 ol ol,
 ul ul {
   margin: 0!important;
