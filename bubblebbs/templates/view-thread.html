@@ -7,7 +7,7 @@
     <article>
         <section class="op">
             <header>
-                <h1>Thread #{{ post.id }} by {{ post_name(post) }}{% if post.locked %}🔒{% endif %}</h1>
+                <h1>Thread #{{ post.id }} by {{ post_name(post) }}{% if post.locked %}🔒{% endif %}{% if post.permasage %}🌿{% endif %}</h1>
                 <p class="meta">{{ since_bumptime(post.bumptime) | safe }} ago</p>
             </header>
             <div class="message">{{ post.message | word_filter | safe }}</div>

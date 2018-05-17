@@ -44,6 +44,7 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
     locked = db.Column(db.Boolean(), default=False, nullable=False)
+    permasage = db.Column(db.Boolean(), default=False, nullable=False)
     tripcode = db.Column(db.String(64))
     message = db.Column(db.String(2000), nullable=False, unique=True)
     reply_to = db.Column(db.Integer, db.ForeignKey('posts.id'))
@@ -228,8 +229,9 @@ class Post(db.Model):
 
         if reply_to and not form.sage.data:
             original = db.session.query(Post).get(reply_to)
-            original.bumptime = timestamp
-            db.session.commit()
+            if not original.permasage:
+                original.bumptime = timestamp
+                db.session.commit()
 
         return new_post
 
