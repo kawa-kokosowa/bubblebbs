@@ -34,7 +34,7 @@ def complementary_color(my_hex):
     return ''.join(comp)
 
 
-def since_bumptime(bumptime):
+def since_bumptime(bumptime, thread=None, reply=None):
     total_seconds = int((bumptime.now() - bumptime).total_seconds())
     days, seconds = divmod(total_seconds, 86400)
     hours, seconds = divmod(seconds, 3600)
@@ -59,8 +59,19 @@ def since_bumptime(bumptime):
         very_readable = 'now'
 
     datetime_w3c_spec = str(bumptime)[:-3]
+
+    if thread:
+        permalink = '<a href="/threads/{permalink}">{parts} ago</a>'.format(
+            permalink='%d#%d' % (thread, reply) if reply else thread,
+            parts=very_readable,
+        )
+    elif reply:
+        raise Exception('heck no!')
+    else:
+        permalink = very_readable + ' ago'
+
     return '''
     <time datetime="{bumptime}" title="{bumptime}">
-    {parts}
+    {permalink} 
     </time>
-    '''.format(bumptime=datetime_w3c_spec, parts=very_readable)
+    '''.format(bumptime=datetime_w3c_spec, permalink=permalink)

@@ -8,7 +8,7 @@
         <section class="op">
             <header>
                 <h1>Thread #{{ post.id }} by {{ post_name(post) }}{% if post.locked %}🔒{% endif %}{% if post.permasage %}🌿{% endif %}</h1>
-                <p class="meta">{{ since_bumptime(post.bumptime) | safe }} ago</p>
+                <p class="meta">{{ since_bumptime(post.bumptime, post.id) | safe }}</p>
             </header>
             <div class="message">{{ post.message | word_filter | safe }}</div>
         </section>
@@ -18,7 +18,7 @@
           <article class="reply" id="{{ reply.id }}">
             <header>
                 <h1>Reply #{{ reply.id }} by {{ post_name(reply) }}</h1>
-                <p class="meta">{{ since_bumptime(reply.timestamp) | safe }} ago</p>
+                <p class="meta">{{ since_bumptime(reply.timestamp, post.id, reply.id) | safe }}</p>
             </header>
             <div class="message">{{ reply.message | word_filter | safe }}</div>
           </article>

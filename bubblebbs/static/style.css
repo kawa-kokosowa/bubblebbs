@@ -38,6 +38,12 @@ body {
   background-color: #fff;
 }
 
+time a,
+time a:link,
+time a:visited {
+  color: var(--hard-grey);
+}
+
 ol ol,
 ul ul {
   margin: 0!important;
