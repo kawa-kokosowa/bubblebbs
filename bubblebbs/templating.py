@@ -12,16 +12,6 @@ def get_blotter_entries():
     return models.BlotterEntry.query.order_by(models.BlotterEntry.id.desc()).all()
 
 
-def word_filter(message):
-    word_filters = models.db.session.query(models.WordFilter).all()
-    for word_filter in word_filters:
-        find = re.compile(r'\b' + re.escape(word_filter.find) + r'(ies\b|s\b|\b)', re.IGNORECASE)
-        # NOTE: I make it upper because I think it's funnier this way,
-        # plus indicative of wordfiltering happening.
-        message = find.sub(word_filter.replace.upper(), message)
-    return message
-
-
 def complementary_color(my_hex):
     """Returns complementary RGB color
 

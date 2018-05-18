@@ -37,12 +37,21 @@ class TripMeta(db.Model):
     bio_source = db.Column(db.String(400))
 
 
+class FlaggedIps(db.Model):
+    """Keeps track of which IPs have exhibited "bad behavior."
+
+    """
+
+    ip_address = db.Column(db.String(120), primary_key=True)
+
+
 # FIXME: bad schema...
 # TODO: tags
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
+    ip_address = db.Column(db.String(120), nullable=False)
     locked = db.Column(db.Boolean(), default=False, nullable=False)
     permasage = db.Column(db.Boolean(), default=False, nullable=False)
     tripcode = db.Column(db.String(64))
@@ -169,8 +178,19 @@ class Post(db.Model):
         tip_domain = urlparse(tip_link).hostname if tip_link else None
         return tip_link, tip_domain
 
+    @staticmethod
+    def word_filter(message):
+        word_filters = db.session.query(WordFilter).all()
+        for word_filter in word_filters:
+            find = re.compile(r'\b' + re.escape(word_filter.find) + r'(ies\b|s\b|\b)', re.IGNORECASE)
+            # NOTE: I make it upper because I think it's funnier this way,
+            # plus indicative of wordfiltering happening.
+            message = find.sub(word_filter.replace.upper(), message)
+        return message
+
+    # TODO: rename since now needs request for IP address
     @classmethod
-    def from_form(cls, form):
+    def from_form(cls, form, request):
         """Create and return a Post.
 
         The form may be a reply or a new post.
@@ -204,12 +224,24 @@ class Post(db.Model):
         # Parse markdown! FIXME: this probably can be easily exploited...
         message = cls.parse_markdown(timestamp, message)
 
+        # Finally let's do some wordfiltering. Wordfilters are useful because
+        # you can catch bad words and flag users that use them.
+        message_before_filtering = message
+        message = cls.word_filter(message)
+        if message_before_filtering != message:
+            new_flagged_ip = FlaggedIps(
+                ip_address=request.remote_addr,
+            )
+            db.session.add(new_flagged_ip)
+            db.session.commit()
+
         new_post = cls(
             name=name,
             tripcode=tripcode,
             timestamp=timestamp,
             message=message,
             reply_to=reply_to,
+            ip_address=request.remote_addr,
         )
         db.session.add(new_post)
         db.session.commit()

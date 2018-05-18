@@ -28,9 +28,9 @@ app.jinja_env.globals.update(
     complementary_color=templating.complementary_color,
     get_blotter_entries=templating.get_blotter_entries,
 )  # why not move this to templating?
+# TODO: may add filter in future
 app.jinja_env.filters = {
     **app.jinja_env.filters,
-    'word_filter': templating.word_filter,
 }
 limiter = Limiter(
     app,
@@ -153,7 +153,7 @@ def new_reply():
     if form.validate_on_submit():
         # FIXME: REDUNDANT!!!
         try:
-            post = models.Post.from_form(form)
+            post = models.Post.from_form(form, request)
         except Exception as e:
             # FIXME: not 403 but some server-side error... should
             # catch various kinds of errors
@@ -242,7 +242,7 @@ def new_thread():
 
         if form.validate_on_submit():
             try:
-                post = models.Post.from_form(form)
+                post = models.Post.from_form(form, request)
             except Exception as e:
                 # FIXME: not 403 but some server-side error... should
                 # catch various kinds of errors
@@ -292,6 +292,7 @@ with app.app_context():
     admin_.add_view(moderate.MyModelView(models.Post, models.db.session))
     admin_.add_view(moderate.MyModelView(models.Ban, models.db.session))
     admin_.add_view(moderate.MyModelView(models.BlotterEntry, models.db.session))
+    admin_.add_view(moderate.MyModelView(models.FlaggedIps, models.db.session))
     admin_.add_view(moderate.PageModelView(models.Page, models.db.session))
     admin_.add_view(moderate.ConfigView(models.ConfigPair, models.db.session))
     admin_.add_view(moderate.WordFilterView(models.WordFilter, models.db.session))
