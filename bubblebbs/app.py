@@ -44,6 +44,7 @@ def config_db(key: str) -> str:
     return models.ConfigPair.query.get(key).value
 
 
+# NOTE: this currently isn't being used by anything!
 @app.route("/search-json", methods=['GET'])
 def search_json():
     search_for_this_text = request.args.get('search')
@@ -59,7 +60,7 @@ def search_json():
 
 
 @app.route("/", methods=['GET'])
-@limiter.limit("45 per minute")
+@limiter.limit("30 per minute")
 def list_threads():
     """View threads by bumptime in a list.
 
@@ -100,7 +101,7 @@ def list_threads():
 
 # FIXME: check if reply or not for error/404, else...
 @app.route("/threads/<int:post_id>")
-@limiter.limit("30 per minute")
+@limiter.limit("45 per minute")
 def view_specific_post(post_id: int):
     """View a thread by ID.
 
@@ -133,7 +134,7 @@ def view_specific_post(post_id: int):
 
 
 @app.route("/replies/new", methods=['POST'])
-@limiter.limit("25 per hour")
+@limiter.limit("20 per hour")
 def new_reply():
     """Provide form for new thread on GET, create new thread on POST.
 
@@ -221,7 +222,7 @@ def edit_trip_meta(tripcode: str):
 # FIXME must check if conflicting slug...
 # what if making reply but reply is a comment?!
 @app.route("/threads/new", methods=['GET', 'POST'])
-@limiter.limit("10 per hour")
+@limiter.limit("5 per hour")
 def new_thread():
     """Provide form for new thread on GET, create new thread on POST.
 
