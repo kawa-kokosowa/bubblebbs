@@ -49,6 +49,19 @@ def config_db(key: str) -> str:
     return models.ConfigPair.query.get(key).value
 
 
+def validate_recaptcha():
+    import requests
+    verify_result = requests.post(
+        'https://www.google.com/recaptcha/api/siteverify',
+        data={
+            'secret': '6Lc3-FkUAAAAAL-cl-zQA66aOFZD4ONGzQZdE-xh',
+            'response': request.form['g-recaptcha-response'],
+            'remoteip': request.remote_addr,
+        },
+    ).json()
+    return verify_result['success'] == True
+
+
 # NOTE: this currently isn't being used by anything!
 @app.route("/search-json", methods=['GET'])
 def search_json():
@@ -144,6 +157,9 @@ def new_reply():
     """Provide form for new thread on GET, create new thread on POST.
 
     """
+
+    if not validate_recaptcha():
+        return render_template('errors.html', errors=['Captcha failed!'])
 
     reply_to = request.form.get('reply_to')
     form = forms.NewPostForm()
@@ -263,7 +279,8 @@ def error_page_form_handler(form):
 # FIXME must check if conflicting slug...
 # what if making reply but reply is a comment?!
 @app.route("/threads/new", methods=['GET', 'POST'])
-@limiter.limit("10 per hour")
+# FIXME: set back to 10
+@limiter.limit("30 per hour")
 def new_thread():
     """Provide form for new thread on GET, create new thread on POST.
 
@@ -273,6 +290,8 @@ def new_thread():
         new_thread_form = forms.NewPostForm(data=request.cookies if request.cookies.get('remember_name') else {})
         return render_template('new-thread.html', form=new_thread_form)
     elif request.method == 'POST':
+        if not validate_recaptcha():
+            return render_template('errors.html', errors=['Captcha failed!'])
         reply_to = request.form.get('reply_to')
         form = forms.NewPostForm()
 
