@@ -219,6 +219,31 @@ def edit_trip_meta(tripcode: str):
         raise Exception([models.Post.make_tripcode('lol#' + trip_meta_form.unhashed_tripcode.data), tripcode])
 
 
+@app.route('/cookie', methods=['POST', 'GET'])
+@limiter.limit("10 per hour")
+def manage_cookie(tripcode: str):
+    cookie_form = forms.CookieManagementForm()
+
+    if request.method == 'GET':
+        return render_template('cookie.html', form=cookie_form)
+    elif request.method == 'POST' and cookie_form.validate_on_submit():
+        import datetime
+        from flask import make_response
+        response = make_response(render_template('cookie.html', form=cookie_form))
+        if cookie_form.stylesheet_url:
+        response.set_cookie(
+            name,
+            value,
+            expires=datetime.datetime.now() + datetime.timedelta(days=30),
+        )
+        trip_meta.bio_source = trip_meta_form.bio.data
+        trip_meta.bio = models.Post.parse_markdown('', trip_meta_form.bio.data)
+        models.db.session.commit()
+        return redirect(url_for('view_trip_meta', tripcode=tripcode))
+    else:
+        raise Exception([models.Post.make_tripcode('lol#' + trip_meta_form.unhashed_tripcode.data), tripcode])
+
+
 # FIXME must check if conflicting slug...
 # what if making reply but reply is a comment?!
 @app.route("/threads/new", methods=['GET', 'POST'])
