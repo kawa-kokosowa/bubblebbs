@@ -34,6 +34,7 @@
         {{ form.reply_to(value=post.id) }}
         <div>
         <label class="do-not-bump">Do not bump {{ form.sage }}</label>
+        {{ recaptcha }}
         <input type="submit" value="Post!">
         </div>
       </fieldset>
