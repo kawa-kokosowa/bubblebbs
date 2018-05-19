@@ -606,12 +606,11 @@ th.replies {
 {
   html,
   body {
-    font-size: 12px;
+    font-size: 11px;
     padding: 0;
   }
 
   #actions {
-    font-size: 10px;
   }
 
   #actions li + li:before {
@@ -625,6 +624,11 @@ th.replies {
 
   #list-threads {
     font-size: 0.90rem;
+  }
+
+  #list-thread th.list-message,
+  #list-thread td.list-message {
+    width: 100%!important;
   }
 
   #list-threads th {
