@@ -575,7 +575,8 @@ fieldset input[type=submit] {
   background-color: var(--soft-grey);
 }
 
-td.list-bump {
+td.list-bump,
+td.list-last {
   font-size: 0.85rem;
 }
 
