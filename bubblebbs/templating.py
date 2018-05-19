@@ -12,18 +12,29 @@ def get_blotter_entries():
     return models.BlotterEntry.query.order_by(models.BlotterEntry.id.desc()).all()
 
 
+# FIXME: rename to "contrast text" or something
+# TODO: the brightness factor...
 def complementary_color(my_hex):
-    """Returns complementary RGB color
+    """Returns maximal contrast color to provided.
 
     Example:
     >>>complementaryColor('FFFFFF')
     '000000'
+
     """
+
     if my_hex[0] == '#':
         my_hex = my_hex[1:]
-    rgb = (my_hex[0:2], my_hex[2:4], my_hex[4:6])
-    comp = ['%02X' % (255 - int(a, 16)) for a in rgb]
-    return ''.join(comp)
+
+    my_hex_number = int(my_hex, 16)
+    absolute_grey = int('ffffff', 16) / 2
+
+    if my_hex_number > absolute_grey:
+        return '000000'
+    elif my_hex_number == absolute_grey:
+        return '000000'
+    else:
+        return 'ffffff'
 
 
 def since_bumptime(bumptime, thread=None, reply=None):
