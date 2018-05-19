@@ -635,4 +635,9 @@ th.replies {
   #list-threads th {
     padding: 0;
   }
+
+  #list-threads td.list-bump,
+  #list-threads td.list-last {
+    font-size: 0.75rem;
+  }
 }
