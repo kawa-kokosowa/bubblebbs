@@ -12,8 +12,8 @@ class CookieManagementForm(FlaskForm):
     """
 
     remember_name = BooleanField()
-    stylesheet = StringField(
-        'Stylesheet URL',
+    stylesheet_url = StringField(
+        'Stylesheet URI',
         render_kw={'placeholder': 'http://example.org/style.css'},
     )
 

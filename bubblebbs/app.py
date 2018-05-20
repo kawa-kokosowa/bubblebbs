@@ -1,8 +1,9 @@
 import os
 import random
+import datetime
 
 from flask import (
-    Flask, redirect, render_template, url_for, send_from_directory, request, send_file, jsonify
+    Flask, redirect, render_template, url_for, send_from_directory, request, send_file, jsonify, make_response
 )
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
@@ -107,7 +108,7 @@ def view_specific_post(post_id: int):
 
     """
 
-    form = forms.NewPostForm()
+    form = forms.NewPostForm(data=request.cookies if request.cookies.get('remember_name') else {})
     post = models.db.session.query(models.Post).get(post_id)
     if post.reply_to:
         return (
@@ -162,14 +163,22 @@ def new_reply():
         # FIXME: if this is a new thread and the maximum number
         # of threads has been reached, delete the oldest thread
         # and its replies.
-
-        return redirect(
+        response = redirect(
             url_for(
                 'view_specific_post',
                 post_id=post.reply_to,
                 _anchor=post.id,
             )
         )
+        response = make_response(response)
+        if form.name.data:
+            response.set_cookie(
+                'name',
+                form.name.data,
+                expires=datetime.datetime.now() + datetime.timedelta(days=30),
+            )
+
+        return response
 
     # FIXME: REDUNDANT!!!
     # TODO: earlier in process near other errors
@@ -221,27 +230,35 @@ def edit_trip_meta(tripcode: str):
 
 @app.route('/cookie', methods=['POST', 'GET'])
 @limiter.limit("10 per hour")
-def manage_cookie(tripcode: str):
-    cookie_form = forms.CookieManagementForm()
+def manage_cookie():
+    cookie_form = forms.CookieManagementForm(data=request.cookies)
 
     if request.method == 'GET':
         return render_template('cookie.html', form=cookie_form)
     elif request.method == 'POST' and cookie_form.validate_on_submit():
-        import datetime
-        from flask import make_response
-        response = make_response(render_template('cookie.html', form=cookie_form))
-        if cookie_form.stylesheet_url:
+
+        response = make_response(
+            redirect(
+                url_for(
+                    'manage_cookie',
+                ),
+            ),
+        )
+
+        if cookie_form.stylesheet_url.data:
+            response.set_cookie(
+                'stylesheet_url',
+                cookie_form.stylesheet_url.data,
+                expires=datetime.datetime.now() + datetime.timedelta(days=30),
+            )
+
         response.set_cookie(
-            name,
-            value,
+            'remember_name',
+            'true' if cookie_form.remember_name.data else '',
             expires=datetime.datetime.now() + datetime.timedelta(days=30),
         )
-        trip_meta.bio_source = trip_meta_form.bio.data
-        trip_meta.bio = models.Post.parse_markdown('', trip_meta_form.bio.data)
-        models.db.session.commit()
-        return redirect(url_for('view_trip_meta', tripcode=tripcode))
-    else:
-        raise Exception([models.Post.make_tripcode('lol#' + trip_meta_form.unhashed_tripcode.data), tripcode])
+
+        return response
 
 
 # FIXME must check if conflicting slug...
@@ -254,7 +271,8 @@ def new_thread():
     """
 
     if request.method == 'GET':
-        return render_template('new-thread.html', form=forms.NewPostForm())
+        new_thread_form = forms.NewPostForm(data=request.cookies if request.cookies.get('remember_name') else {})
+        return render_template('new-thread.html', form=new_thread_form)
     elif request.method == 'POST':
         # First check if IP banned
         ban = moderate.ban_lookup(request)
@@ -265,6 +283,7 @@ def new_thread():
         reply_to = request.form.get('reply_to')
         form = forms.NewPostForm()
 
+        # TODO: why this if above
         if form.validate_on_submit():
             try:
                 post = models.Post.from_form(form, request)
@@ -276,30 +295,34 @@ def new_thread():
             # FIXME: if this is a new thread and the maximum number
             # of threads has been reached, delete the oldest thread
             # and its replies.
-
-            if post.reply_to:
-                return redirect(
-                    url_for(
-                        'view_specific_post',
-                        post_id=post.reply_to,
-                        _anchor=post.id,
-                    )
+            response = redirect(
+                url_for(
+                    'view_specific_post',
+                    post_id=post.id,
                 )
-            else:
-                return redirect(
-                    url_for(
-                        'view_specific_post',
-                        post_id=post.id,
-                    )
-                )
+            )
+        else:
+            # TODO: earlier in process near other errors
+            errors = []
+            for field, field_errors in form.errors.items():
+                field_name = getattr(form, field).label.text
+                for error in field_errors:
+                    errors.append("%s: %s" % (field_name, error))
+            if errors:
+                return render_template('errors.html', errors=errors), 400
 
-        # TODO: earlier in process near other errors
-        errors = []
-        for field, field_errors in form.errors.items():
-            field_name = getattr(form, field).label.text
-            for error in field_errors:
-                errors.append("%s: %s" % (field_name, error))
-        return render_template('errors.html', errors=errors), 400
+
+
+        # FIXME
+        response = make_response(response)
+        if form.name.data:
+            response.set_cookie(
+                'name',
+                form.name.data,
+                expires=datetime.datetime.now() + datetime.timedelta(days=30),
+            )
+
+        return response
 
 
 with app.app_context():
