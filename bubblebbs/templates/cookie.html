@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}🍪Cookie{% endblock %}
+
+{% block content %}
+<form action="/cookie" method="POST" enctype="multipart/form-data">
+  <fieldset>
+    <legend>Cookie settings 🍪</legend>
+    {{ form.csrf_token() }}
+    <label class="remember-name">Remember my name {{ form.remember_name }}</label>
+    <label>Stylesheet (URI): {{ form.stylesheet_url }}</label>
+    <input type="submit" value="Post!">
+  </fieldset>
+</form>
+{% endblock %}

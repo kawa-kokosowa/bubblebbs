@@ -6,6 +6,18 @@ from flask_wtf.file import FileField, FileRequired
 from werkzeug.utils import secure_filename
 
 
+class CookieManagementForm(FlaskForm):
+    """Form for managing cookie settings.
+
+    """
+
+    remember_name = BooleanField()
+    stylesheet_url = StringField(
+        'Stylesheet URI',
+        render_kw={'placeholder': 'http://example.org/style.css'},
+    )
+
+
 class NewPostForm(FlaskForm):
     """Form for creating a new post.
 
