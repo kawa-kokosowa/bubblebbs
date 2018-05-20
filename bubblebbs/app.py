@@ -28,6 +28,7 @@ app.jinja_env.globals.update(
     color_hash=ColorHash,
     complementary_color=templating.complementary_color,
     get_blotter_entries=templating.get_blotter_entries,
+    get_stylesheet=templating.get_stylesheet,
 )  # why not move this to templating?
 # TODO: may add filter in future
 app.jinja_env.filters = {
@@ -245,13 +246,11 @@ def manage_cookie():
             ),
         )
 
-        if cookie_form.stylesheet_url.data:
-            response.set_cookie(
-                'stylesheet_url',
-                cookie_form.stylesheet_url.data,
-                expires=datetime.datetime.now() + datetime.timedelta(days=30),
-            )
-
+        response.set_cookie(
+            'stylesheet_url',
+            cookie_form.stylesheet_url.data,
+            expires=datetime.datetime.now() + datetime.timedelta(days=30),
+        )
         response.set_cookie(
             'remember_name',
             'true' if cookie_form.remember_name.data else '',

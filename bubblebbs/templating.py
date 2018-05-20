@@ -1,7 +1,13 @@
 # TODO: move all the model stuff that's templating into here
 import re
 
+from flask import request
+
 from . import models
+
+
+def get_stylesheet():
+    return request.cookies.get('stylesheet_url')
 
 
 def get_pages():
