@@ -7,6 +7,25 @@ Text BBS/message board.
 
 This project is in alpha. It is currently unversioned and very messy.
 
+Features:
+
+  * Cookie manager allows users to control name-remembering and custom
+    stylesheets
+  * Trip meta pages exist as soon as the tripcode is used when creating a post!
+    You can edit these pages by supplying a string which hashes to that
+    tripcode! Shows posts by that tripcode, as well as post counts!
+  * Markdown support
+  * Create pages
+  * Word filter lets you not only filter words (also pattern matches on
+    plurals), but "flag" IP addresses that use those words
+  * Automatically ban users based on certain phrases
+  * Manage site through backend
+  * Site blotter
+  * Doesn't allow duplicate posts
+  * Tripcodes hash to color and emoji
+  * Fluid default stylesheet
+  * Full text search
+
 ## General technical
 
 Before you start:
