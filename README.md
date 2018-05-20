@@ -3,7 +3,7 @@
 [![Build
 Status](https://travis-ci.org/lily-fyi/bubblebbs.svg?branch=master)](https://travis-ci.org/lily-fyi/bubblebbs)
 
-Text BBS/message board.
+Text BBS/message board which runs [bubblebbs.cafe](http://bubblebbs.cafe).
 
 This project is in alpha. It is currently unversioned and very messy.
 
