@@ -9,7 +9,6 @@ from flask import (
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_limiter import Limiter
-from flask_recaptcha import ReCaptcha
 from flask_limiter.util import get_remote_address
 from colorhash import ColorHash
 from pymojihash.pymojihash import hash_to_emoji
@@ -23,7 +22,6 @@ from . import templating
 
 app = Flask(__name__)
 app.config.from_object(config)
-recaptcha = ReCaptcha(app=app)
 app.jinja_env.globals.update(
     since_bumptime=templating.since_bumptime,
     get_pages=templating.get_pages,

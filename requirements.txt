@@ -6,7 +6,6 @@ Flask==0.12.2
 Flask-Admin==1.5.1
 Flask-Limiter==1.0.1
 Flask-Login==0.4.1
-Flask-ReCaptcha==0.4.2
 Flask-SQLAlchemy==2.3.2
 Flask-WTF==0.14.2
 html5lib==1.0.1
