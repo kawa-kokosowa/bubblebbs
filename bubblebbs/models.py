@@ -14,6 +14,8 @@ from mdx_bleach.extension import BleachExtension
 from markdown.extensions.footnotes import FootnoteExtension
 from markdown.extensions.smarty import SmartyExtension
 from markdown.extensions.wikilinks import WikiLinkExtension
+from flask import request
+from sqlalchemy.exc import (InvalidRequestError, IntegrityError)
 from jinja2 import Markup
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
@@ -22,6 +24,31 @@ from . import config
 
 
 db = SQLAlchemy()
+
+
+class ErrorPageException(Exception):
+    def __init__(self, format_docstring: dict = {}):
+        self.message = self.__doc__.format(**format_docstring)
+        super().__init__(self.message)
+        self.http_status = self.HTTP_STATUS
+
+
+class RemoteAddrIsBanned(ErrorPageException):
+    """The remote address {address} attempting to perform this action
+    was banned and thus prohibited from doing so.
+
+    """
+
+    HTTP_STATUS = 420  # FIXME
+
+
+class DuplicateMessage(ErrorPageException):
+    """You tried to make a (duplicate) post that's already been
+    made before. Please try to be more original.
+
+    """
+
+    HTTP_STATUS = 420  # FIXME
 
 
 class TripMeta(db.Model):
@@ -35,6 +62,24 @@ class TripMeta(db.Model):
     post_count = db.Column(db.Integer, default=0, nullable=False)
     bio = db.Column(db.String(1000))
     bio_source = db.Column(db.String(400))
+
+    @staticmethod
+    def increase_post_count_or_create(tripcode: str):
+        if tripcode:
+            trip_meta = db.session.query(TripMeta).get(tripcode)
+            if trip_meta:
+                trip_meta.post_count += 1
+            else:
+                new_trip_meta = TripMeta(
+                    tripcode=tripcode,
+                    post_count=1,
+                )
+                db.session.add(new_trip_meta)
+            db.session.commit()
+
+
+class BannablePhrases(db.Model):
+    phrase = db.Column(db.String(100), primary_key=True)
 
 
 class FlaggedIps(db.Model):
@@ -72,12 +117,18 @@ class Post(db.Model):
         pass
 
     @staticmethod
-    def reference_links(message: str, thread_id: int) -> str:
+    def reference_links(form) -> str:
         """Parse >>id links"""
+
+        if not form.reply_to.data:
+            return form.message.data
+
+        message = form.message.data
+        reply_to = int(form.reply_to.data)
 
         pattern = re.compile('\>\>([0-9]+)')
         message_with_links = pattern.sub(
-            r'<a href="/threads/%d#\1">&gt;&gt;\1</a>' % thread_id,
+            r'<a href="/threads/%d#\1">&gt;&gt;\1</a>' % reply_to,
             message,
         )
         return message_with_links
@@ -147,7 +198,7 @@ class Post(db.Model):
 
     # FIXME: what if passed a name which contains no tripcode?
     @staticmethod
-    def make_tripcode(name_and_tripcode: str) -> Tuple[str, str]:
+    def make_tripcode(form) -> Tuple[str, str]:
         """Create a tripcode from the name field of a post.
 
         Returns:
@@ -160,7 +211,12 @@ class Post(db.Model):
 
         """
 
-        name, unhashed_tripcode = name_and_tripcode.split('#', 1)
+        # A valid tripcode is a name field containing an octothorpe
+        # that isn't the last character.
+        if not (form.name.data and '#' in form.name.data[:-1]):
+            return form.name.data, None
+
+        name, unhashed_tripcode = form.name.data.split('#', 1)
         tripcode = str(
             base64.b64encode(
                 scrypt.hash(unhashed_tripcode, config.SECRET_KEY),
@@ -180,17 +236,81 @@ class Post(db.Model):
 
     @staticmethod
     def word_filter(message):
+        # Finally let's do some wordfiltering. Wordfilters are useful because
+        # you can catch bad words and flag users that use them.
+        message_before_filtering = message
+
         word_filters = db.session.query(WordFilter).all()
         for word_filter in word_filters:
             find = re.compile(r'\b' + re.escape(word_filter.find) + r'(ies\b|s\b|\b)', re.IGNORECASE)
             # NOTE: I make it upper because I think it's funnier this way,
             # plus indicative of wordfiltering happening.
             message = find.sub(word_filter.replace.upper(), message)
+
+        if message_before_filtering != message:
+            new_flagged_ip = FlaggedIps(
+                ip_address=request.remote_addr,
+            )
+            try:
+                db.session.add(new_flagged_ip)
+                db.session.commit()
+                db.session.flush()
+            except IntegrityError:
+                db.session.rollback()
+
         return message
+
+    @staticmethod
+    def bannable_phrases(message: str):
+        # Check if any banned phrases are in this text, and if so,
+        # ban this user and don't make post!
+        bannable_phrases = db.session.query(BannablePhrases).all()
+        for phrase in bannable_phrases:
+            if phrase.phrase in message:
+                new_flagged_ip = FlaggedIps(
+                    ip_address=request.remote_addr,
+                )
+                new_banned_ip = Ban(
+                    address=request.remote_addr,
+                    reason=phrase.phrase,
+                )
+
+                try:
+                    db.session.add(new_flagged_ip)
+                    db.session.add(new_banned_ip)
+                    db.session.commit()
+                    db.session.flush()
+                except IntegrityError:
+                    db.session.rollback()
+
+                raise RemoteAddrIsBanned(format_docstring={'address': request.remote_addr})
+
+    @staticmethod
+    def set_bump(form, reply_to, timestamp):
+        if reply_to and not form.sage.data:
+            original = db.session.query(Post).get(reply_to)
+            if not original.permasage:
+                original.bumptime = timestamp
+                db.session.commit()
+
+    @classmethod
+    def mutate_message(cls, form, timestamp):
+        """Change the message in various ways before saving to DB."""
+
+        message = cls.reference_links(form)
+        message = cls.parse_markdown(timestamp, message)
+        message = cls.word_filter(message)
+        return message
+
+    @staticmethod
+    def ban_check(form):
+        ban = db.session.query(Ban).get(request.remote_addr)
+        if ban:
+            raise RemoteAddrIsBanned(format_docstring={'address': ban.adddress})
 
     # TODO: rename since now needs request for IP address
     @classmethod
-    def from_form(cls, form, request):
+    def from_form(cls, form):
         """Create and return a Post.
 
         The form may be a reply or a new post.
@@ -200,41 +320,19 @@ class Post(db.Model):
 
         """
 
-        # A valid tripcode is a name field containing an octothorpe
-        # that isn't the last character.
-        if form.name.data and '#' in form.name.data[:-1]:
-            name, tripcode = cls.make_tripcode(form.name.data)
-        else:
-            name = form.name.data
-            tripcode = None
-
-        message = form.message.data
-        # message link
-        try:
-            reply_to = int(form.reply_to.data)
-            message = cls.reference_links(message, reply_to)
-        except (ValueError, AttributeError) as e:
-            reply_to = None
-
+        # First the things which woudl prevent the post from being made
+        cls.ban_check(form)
+        cls.bannable_phrases(form.message.data)
+        reply_to = int(form.reply_to.data) if form.reply_to.data else None
         if reply_to and db.session.query(Post).get(reply_to).locked:
             raise Exception('This thread is locked. You cannot reply.')
 
-        # manually generate the timestamp so we can create unique ids
+        # Prepare info for saving to DB
+        name, tripcode = cls.make_tripcode(form)
         timestamp = datetime.datetime.utcnow()
-        # Parse markdown! FIXME: this probably can be easily exploited...
-        message = cls.parse_markdown(timestamp, message)
+        message = cls.mutate_message(form, timestamp)
 
-        # Finally let's do some wordfiltering. Wordfilters are useful because
-        # you can catch bad words and flag users that use them.
-        message_before_filtering = message
-        message = cls.word_filter(message)
-        if message_before_filtering != message:
-            new_flagged_ip = FlaggedIps(
-                ip_address=request.remote_addr,
-            )
-            db.session.add(new_flagged_ip)
-            db.session.commit()
-
+        # Save!
         new_post = cls(
             name=name,
             tripcode=tripcode,
@@ -243,27 +341,19 @@ class Post(db.Model):
             reply_to=reply_to,
             ip_address=request.remote_addr,
         )
-        db.session.add(new_post)
-        db.session.commit()
-
-        # increase postcount for tripcode
-        if tripcode:
-            trip_meta = db.session.query(TripMeta).get(tripcode)
-            if trip_meta:
-                trip_meta.post_count += 1
-            else:
-                new_trip_meta = TripMeta(
-                    tripcode=tripcode,
-                    post_count=1,
-                )
-                db.session.add(new_trip_meta)
+        # NOTE: this block with the flush and rollback seems like
+        # high potential for breaking everything when high traffic?
+        try:
+            db.session.add(new_post)
             db.session.commit()
+            db.session.flush()
+        except (InvalidRequestError, IntegrityError) as e:
+            db.session.rollback()
+            raise DuplicateMessage()
 
-        if reply_to and not form.sage.data:
-            original = db.session.query(Post).get(reply_to)
-            if not original.permasage:
-                original.bumptime = timestamp
-                db.session.commit()
+        # TODO: after save method?
+        TripMeta.increase_post_count_or_create(tripcode)
+        cls.set_bump(form, reply_to, timestamp)
 
         return new_post
 
@@ -310,8 +400,7 @@ class User(db.Model):
 
 class Ban(db.Model):
     """Admin can ban by address or network."""
-    id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(100), unique=True)
+    address = db.Column(db.String(100), primary_key=True)
     reason = db.Column(db.String(100))
 
     @classmethod

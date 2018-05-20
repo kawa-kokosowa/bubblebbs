@@ -142,24 +142,14 @@ def new_reply():
 
     """
 
-    # FIXME: redundant
-    # First check if IP banned
-    ban = moderate.ban_lookup(request)
-    if ban:
-        ban_message = 'Your IP %s was banned: %s' % (ban.address, ban.reason)
-        return render_template('errors.html', errors=[ban_message])
-
     reply_to = request.form.get('reply_to')
     form = forms.NewPostForm()
 
     if form.validate_on_submit():
-        # FIXME: REDUNDANT!!!
         try:
-            post = models.Post.from_form(form, request)
-        except Exception as e:
-            # FIXME: not 403 but some server-side error... should
-            # catch various kinds of errors
-            return render_template('errors.html', errors=[e]), 403
+            post = models.Post.from_form(form)
+        except (models.RemoteAddrIsBanned, models.DuplicateMessage) as e:
+            return render_template('errors.html', errors=[e]), e.http_status
 
         # FIXME: if this is a new thread and the maximum number
         # of threads has been reached, delete the oldest thread
@@ -181,14 +171,9 @@ def new_reply():
 
         return response
 
-    # FIXME: REDUNDANT!!!
-    # TODO: earlier in process near other errors
-    errors = []
-    for field, field_errors in form.errors.items():
-        field_name = getattr(form, field).label.text
-        for error in field_errors:
-            errors.append("%s: %s" % (field_name, error))
-    return render_template('errors.html', errors=errors), 400
+    error_response = error_page_form_handler(form)
+    if error_response:
+        return error_response
 
 
 @app.route('/pages/<slug>')
@@ -260,6 +245,18 @@ def manage_cookie():
         return response
 
 
+def error_page_form_handler(form):
+    errors = []
+    for field, field_errors in form.errors.items():
+        field_name = getattr(form, field).label.text
+        for error in field_errors:
+            errors.append("%s: %s" % (field_name, error))
+    if errors:
+        return render_template('errors.html', errors=errors), 400
+
+    return None
+
+
 # FIXME must check if conflicting slug...
 # what if making reply but reply is a comment?!
 @app.route("/threads/new", methods=['GET', 'POST'])
@@ -273,23 +270,15 @@ def new_thread():
         new_thread_form = forms.NewPostForm(data=request.cookies if request.cookies.get('remember_name') else {})
         return render_template('new-thread.html', form=new_thread_form)
     elif request.method == 'POST':
-        # First check if IP banned
-        ban = moderate.ban_lookup(request)
-        if ban:
-            ban_message = 'Your IP %s was banned: %s' % (ban.address, ban.reason)
-            return render_template('errors.html', errors=[ban_message])
-
         reply_to = request.form.get('reply_to')
         form = forms.NewPostForm()
 
         # TODO: why this if above
         if form.validate_on_submit():
             try:
-                post = models.Post.from_form(form, request)
-            except Exception as e:
-                # FIXME: not 403 but some server-side error... should
-                # catch various kinds of errors
-                return render_template('errors.html', errors=[e]), 403
+                post = models.Post.from_form(form)
+            except (models.RemoteAddrIsBanned, models.DuplicateMessage) as e:
+                return render_template('errors.html', errors=[e]), e.http_status
 
             # FIXME: if this is a new thread and the maximum number
             # of threads has been reached, delete the oldest thread
@@ -302,15 +291,9 @@ def new_thread():
             )
         else:
             # TODO: earlier in process near other errors
-            errors = []
-            for field, field_errors in form.errors.items():
-                field_name = getattr(form, field).label.text
-                for error in field_errors:
-                    errors.append("%s: %s" % (field_name, error))
-            if errors:
-                return render_template('errors.html', errors=errors), 400
-
-
+            error_response = error_page_form_handler(form)
+            if error_response:
+                return error_response
 
         # FIXME
         response = make_response(response)
@@ -337,12 +320,13 @@ with app.app_context():
     # Add views
     admin_.add_view(moderate.AdminUserModelView(models.User, models.db.session))
     admin_.add_view(moderate.MyModelView(models.Post, models.db.session))
-    admin_.add_view(moderate.MyModelView(models.Ban, models.db.session))
+    admin_.add_view(moderate.BanView(models.Ban, models.db.session))
     admin_.add_view(moderate.MyModelView(models.BlotterEntry, models.db.session))
     admin_.add_view(moderate.MyModelView(models.FlaggedIps, models.db.session))
     admin_.add_view(moderate.PageModelView(models.Page, models.db.session))
     admin_.add_view(moderate.ConfigView(models.ConfigPair, models.db.session))
     admin_.add_view(moderate.WordFilterView(models.WordFilter, models.db.session))
+    admin_.add_view(moderate.BannablePhraseView(models.BannablePhrases, models.db.session))
 
     models.db.init_app(app)
     moderate.build_sample_db()

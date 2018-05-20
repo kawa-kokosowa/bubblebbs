@@ -141,6 +141,14 @@ class ConfigView(MyModelView):
     # how to disable create view..?
 
 
+class BannablePhraseView(MyModelView):
+    form_columns = ['phrase']
+
+
+class BanView(MyModelView):
+    form_columns = ['address']
+
+
 class WordFilterView(MyModelView):
     form_columns = ['find', 'replace']
     column_list = ['find', 'replace']
