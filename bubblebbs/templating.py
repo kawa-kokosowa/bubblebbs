@@ -57,8 +57,9 @@ def since_bumptime(bumptime, thread=None, reply=None):
                 output += 's'
             parts.append(output)
 
-    very_readable = ', '.join(parts)
-    if not very_readable:
+    if parts:
+        very_readable = parts[0]
+    else:
         very_readable = 'now'
 
     datetime_w3c_spec = str(bumptime)[:-3]
