@@ -3,10 +3,12 @@
 import os
 import re
 import base64
+import zlib
 import pathlib
 import datetime
 from typing import Tuple, Union
 from urllib.parse import urlparse
+import urllib.parse
 
 import scrypt
 import markdown
@@ -246,11 +248,23 @@ class Post(db.Model):
             return form.name.data, None
 
         name, unhashed_tripcode = form.name.data.split('#', 1)
-        tripcode = str(
+
+        # Create the salt
+        if len(name) % 2 == 0:
+            salt = name + config.SECRET_SALT
+        else:
+            salt = config.SECRET_SALT + name
+
+        unfiltered_tripcode = str(
             base64.b64encode(
-                scrypt.hash(unhashed_tripcode, name + config.SECRET_KEY),
+                scrypt.hash(
+                    name + config.SECRET_KEY + unhashed_tripcode,
+                    salt,
+                    buflen=16,
+                ),
             ),
-        )[2:-1].replace('/', '-')
+        )[2:-1]
+        tripcode = unfiltered_tripcode.replace('/', '*').replace('+', '.').replace('=', '~')
         return name, tripcode
 
     @staticmethod

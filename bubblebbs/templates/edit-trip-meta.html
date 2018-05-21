@@ -6,7 +6,7 @@
   <fieldset>
     <legend>Edit tripcode meta for {{ tripcode }}</legend>
     {{ form.csrf_token() }}
-    <label>tripcode (unhashed): {{ form.unhashed_tripcode }}</label>
+    <label>name (with tripcode): {{ form.name }}</label>
     <label>bio: {{ form.bio }}</label>
     <input type="submit" value="Update post meta!">
   </fieldset>

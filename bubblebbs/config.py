@@ -6,6 +6,7 @@ RECAPTCHA_SITE_KEY = os.environ.get('BBBS_RECAPTCHA_SITE_KEY', 'CHANGEGME')
 RECAPTCHA_SECRET_KEY = os.environ.get('BBS_RECAPTCHA_SECRET_KEY', 'CHANGEME')
 
 SECRET_KEY = os.environ.get('BBBS_SECRET_KEY', 'PLEASE CHANGE ME')
+SECRET_SALT = os.environ.get('BBS_SECRET_SALT', 'CHANGEME')
 SQLALCHEMY_DATABASE_URI = os.environ.get('BBBS_DB_STRING', 'sqlite:///test.db')
 
 SITE_TAGLINE = os.environ.get('BBBS_SITE_TAGLINE', 'some tagline')

@@ -34,7 +34,7 @@ class NewPostForm(FlaskForm):
 
 class TripMetaForm(FlaskForm):
     bio = TextAreaField('Message', validators=[DataRequired()])
-    unhashed_tripcode = StringField(
-        'Unhashed Tripcode',
-        render_kw={'placeholder': 'tripcode'},
+    name = StringField(
+        'Name (with tripcode)',
+        render_kw={'placeholder': 'name#password'},
     )
