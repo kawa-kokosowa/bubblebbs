@@ -14,11 +14,12 @@ Features:
   * Trip meta pages exist as soon as the tripcode is used when creating a post!
     You can edit these pages by supplying a string which hashes to that
     tripcode! Shows posts by that tripcode, as well as post counts!
-  * Tripcodes salted by both secret *and* the poster's name
+  * Tripcodes salted by both secret *and* the poster's name. This prevents
+    identity-jacking (in the event users happened to use the same password).
   * Flags IPs which use a name with a tripcode that doesn't match the original
     occurence of name's tripcode
   * Prefixes "verified" names with a green checkmark. Verified names are posts
-    which have a tripcode matching the trpcode of the first post with said name.
+    which have a tripcode matching the tripcode of the first post with said name.
   * Markdown support
   * Google Recaptcha
   * Create pages
