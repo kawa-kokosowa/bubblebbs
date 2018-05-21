@@ -16,6 +16,8 @@ Features:
     tripcode! Shows posts by that tripcode, as well as post counts!
   * Flags IPs which use a name with a tripcode that doesn't match the original
     occurence of name's tripcode
+  * Prefixes "verified" names with a green checkmark. Verified names are posts
+    which have a tripcode matching the trpcode of the first post with said name.
   * Markdown support
   * Google Recaptcha
   * Create pages
