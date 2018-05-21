@@ -87,9 +87,19 @@ class BannablePhrases(db.Model):
 class FlaggedIps(db.Model):
     """Keeps track of which IPs have exhibited "bad behavior."
 
+    `ip_address` is not unique so varieties
+    of infractions can be recorded.
+
     """
 
-    ip_address = db.Column(db.String(120), primary_key=True)
+    ip_address = db.Column(db.String(120), nullable=False)
+    reason = db.Column(db.String(100))
+
+    @classmethod
+    def new(cls, ip_address_to_flag: str, flag_reason: str = None):
+        db.session.add(cls(ip_address=ip_address_to_flag, reason=flag_reason))
+        db.session.commit()
+        db.session.flush()
 
 
 # FIXME: bad schema...
@@ -117,6 +127,21 @@ class Post(db.Model):
     @staticmethod
     def extract_hashtags(message: str):
         pass
+
+    @staticmethod
+    def name_tripcode_matches_original_use(name: str, tripcode: str) -> bool:
+        """Verify that this usage of `name` has the correct
+        tripcode as when `name` was originally used.
+
+        """
+
+        first_post_using_name = (
+            Post.query
+            .filter(Post.name == name)
+            .order_by(Post.bumptime.asc())
+            .first()
+        )
+        return (not first_post_using_name) or first_post_using_name == tripcode
 
     @staticmethod
     def reference_links(form) -> str:
@@ -250,15 +275,7 @@ class Post(db.Model):
             message = find.sub(word_filter.replace.upper(), message)
 
         if message_before_filtering != message:
-            new_flagged_ip = FlaggedIps(
-                ip_address=request.remote_addr,
-            )
-            try:
-                db.session.add(new_flagged_ip)
-                db.session.commit()
-                db.session.flush()
-            except IntegrityError:
-                db.session.rollback()
+            FlaggedIps.new(request.remote_addr, 'word filter')
 
         return message
 
@@ -269,27 +286,8 @@ class Post(db.Model):
         bannable_phrases = db.session.query(BannablePhrases).all()
         for phrase in bannable_phrases:
             if phrase.phrase in message:
-                new_flagged_ip = FlaggedIps(
-                    ip_address=request.remote_addr,
-                )
-                new_banned_ip = Ban(
-                    address=request.remote_addr,
-                    reason=phrase.phrase,
-                )
-
-                try:
-                    db.session.add(new_flagged_ip)
-                    db.session.commit()
-                    db.session.flush()
-                except IntegrityError:
-                    db.session.rollback()
-
-                try:
-                    db.session.add(new_banned_ip)
-                    db.session.commit()
-                    db.session.flush()
-                except IntegrityError:
-                    db.session.rollback()
+                FlaggedIps.new(request.remote_addr, 'bannable phrase')
+                Ban.new(request.remote_addr, 'bannable phrase: ' + phrase.phrase)
 
                 raise RemoteAddrIsBanned(
                     format_docstring={
@@ -315,12 +313,6 @@ class Post(db.Model):
         message = cls.word_filter(message)
         return message
 
-    @staticmethod
-    def ban_check(form):
-        ban = db.session.query(Ban).get(request.remote_addr)
-        if ban:
-            raise RemoteAddrIsBanned(format_docstring={'address': ban.address, 'reason': ban.reason})
-
     # TODO: rename since now needs request for IP address
     @classmethod
     def from_form(cls, form):
@@ -334,14 +326,20 @@ class Post(db.Model):
         """
 
         # First the things which woudl prevent the post from being made
-        cls.ban_check(form)
+        Ban.ban_check(request.remote_addr)
         cls.bannable_phrases(form.message.data)
+
         reply_to = int(form.reply_to.data) if form.reply_to.data else None
         if reply_to and db.session.query(Post).get(reply_to).locked:
             raise Exception('This thread is locked. You cannot reply.')
 
         # Prepare info for saving to DB
         name, tripcode = cls.make_tripcode(form)
+        matches_original_use = cls.name_tripcode_matches_original_use(name, tripcode)
+        verified = matches_original_use
+        if not verified:
+            FlaggedIps.new(request.remote_addr, 'unoriginal usage of name (considering tripcode)')
+
         timestamp = datetime.datetime.utcnow()
         message = cls.mutate_message(form, timestamp)
 
@@ -417,6 +415,12 @@ class Ban(db.Model):
     reason = db.Column(db.String(100))
 
     @classmethod
+    def ban_check(cls, ip_address: str):
+        ban = db.session.query(cls).get(ip_address)
+        if ban:
+            raise RemoteAddrIsBanned(format_docstring={'address': ban.address, 'reason': ban.reason})
+
+    @classmethod
     def from_form(cls, form):
         new_ban = cls(
             address=form.address.data,
@@ -426,6 +430,17 @@ class Ban(db.Model):
         db.session.commit()
 
         return new_ban
+
+    @classmethod
+    def new(cls, ip_address_to_ban: str, ban_reason: str = None) -> bool:
+        try:
+            db.session.add(cls(address=ip_address_to_ban, reason=ban_reason))
+            db.session.commit()
+            db.session.flush()
+            return True
+        except IntegrityError:
+            db.session.rollback()
+            return False
 
 
 class BlotterEntry(db.Model):
