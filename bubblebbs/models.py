@@ -248,7 +248,7 @@ class Post(db.Model):
         name, unhashed_tripcode = form.name.data.split('#', 1)
         tripcode = str(
             base64.b64encode(
-                scrypt.hash(unhashed_tripcode, config.SECRET_KEY),
+                scrypt.hash(unhashed_tripcode, name + config.SECRET_KEY),
             ),
         )[2:22].replace('/', '-')
         return name, tripcode
