@@ -92,6 +92,7 @@ class FlaggedIps(db.Model):
 
     """
 
+    id = db.Column(db.Integer, primary_key=True)
     ip_address = db.Column(db.String(120), nullable=False)
     reason = db.Column(db.String(100))
 
@@ -110,6 +111,7 @@ class Post(db.Model):
     name = db.Column(db.String(120))
     ip_address = db.Column(db.String(120), nullable=False)
     locked = db.Column(db.Boolean(), default=False, nullable=False)
+    verified = db.Column(db.Boolean(), default=False, nullable=False)
     permasage = db.Column(db.Boolean(), default=False, nullable=False)
     tripcode = db.Column(db.String(64))
     message = db.Column(db.String(2000), nullable=False, unique=True)
@@ -141,7 +143,7 @@ class Post(db.Model):
             .order_by(Post.bumptime.asc())
             .first()
         )
-        return (not first_post_using_name) or first_post_using_name == tripcode
+        return (not first_post_using_name) or first_post_using_name.tripcode == tripcode
 
     @staticmethod
     def reference_links(form) -> str:
@@ -349,6 +351,7 @@ class Post(db.Model):
             tripcode=tripcode,
             timestamp=timestamp,
             message=message,
+            verified=verified,
             reply_to=reply_to,
             ip_address=request.remote_addr,
         )

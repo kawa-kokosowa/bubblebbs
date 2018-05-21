@@ -272,6 +272,13 @@ pre {
   text-transform: none;
 }
 
+.tripcode-verified:before {
+  content: "\2713 "; 
+  background-color: #00cc00;
+  color: #fff;
+  font-weight: bold;
+}
+
 .brand {
   text-align: center;
 }
