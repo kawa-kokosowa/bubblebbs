@@ -1,7 +1,9 @@
+# TODO: rename this view.py? put app factory in another file?
 import os
 import random
 import datetime
 
+import requests
 from flask import (
     Flask, redirect, render_template, url_for, send_from_directory, request, send_file, jsonify, make_response
 )
@@ -29,6 +31,8 @@ app.jinja_env.globals.update(
     complementary_color=templating.complementary_color,
     get_blotter_entries=templating.get_blotter_entries,
     get_stylesheet=templating.get_stylesheet,
+    recaptcha_enabled=config.RECAPTCHA_ENABLED,
+    recaptcha_site_key=config.RECAPTCHA_SITE_KEY,
 )  # why not move this to templating?
 # TODO: may add filter in future
 app.jinja_env.filters = {
@@ -44,6 +48,21 @@ limiter = Limiter(
 def config_db(key: str) -> str:
     """lol"""
     return models.ConfigPair.query.get(key).value
+
+
+def validate_recaptcha():
+    if config.RECAPTCHA_ENABLED:
+        verify_result = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={
+                'secret': '6Lc3-FkUAAAAAL-cl-zQA66aOFZD4ONGzQZdE-xh',
+                'response': request.form['g-recaptcha-response'],
+                'remoteip': request.remote_addr,
+            },
+        ).json()
+        return verify_result['success'] == True
+    else:
+        return True
 
 
 # NOTE: this currently isn't being used by anything!
@@ -141,6 +160,9 @@ def new_reply():
     """Provide form for new thread on GET, create new thread on POST.
 
     """
+
+    if not validate_recaptcha():
+        return render_template('errors.html', errors=['Captcha failed!'])
 
     reply_to = request.form.get('reply_to')
     form = forms.NewPostForm()
@@ -260,6 +282,7 @@ def error_page_form_handler(form):
 # FIXME must check if conflicting slug...
 # what if making reply but reply is a comment?!
 @app.route("/threads/new", methods=['GET', 'POST'])
+# FIXME: set back to 10
 @limiter.limit("5 per hour")
 def new_thread():
     """Provide form for new thread on GET, create new thread on POST.
@@ -270,6 +293,8 @@ def new_thread():
         new_thread_form = forms.NewPostForm(data=request.cookies if request.cookies.get('remember_name') else {})
         return render_template('new-thread.html', form=new_thread_form)
     elif request.method == 'POST':
+        if not validate_recaptcha():
+            return render_template('errors.html', errors=['Captcha failed!'])
         reply_to = request.form.get('reply_to')
         form = forms.NewPostForm()
 

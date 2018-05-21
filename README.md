@@ -33,7 +33,12 @@ Before you start:
   * Make sure you're using latest Docker and docker-compose, install according to
     Docker community instructions, don't install via your distribution's repo (it's
     probably way out-of-date!).
-  * Docker will look for `.env-file`. So you need to `touch .env-file`.
+  * Docker will look for `.env-file`. So you need to `touch .env-file`. This
+    includes setting up your Google Recaptcha info. Here are possible
+    `.env-file` settings:
+    * `BBBS_RECAPTCHA_SITE_KEY`
+    * `BBBS_RECAPTCHA_SECRET_KEY`
+    * `BBBS_SECRET_KEY`
 
 There are multiple ways to run the app:
 

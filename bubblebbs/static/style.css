@@ -30,6 +30,12 @@ body {
   margin: 0;
 }
 
+.g-recaptcha {
+  clear: both;
+  text-align: center;
+  padding-top: 1.5rem;
+}
+
 .do-not-bump {
   /* idk what to do with it rn */
 }

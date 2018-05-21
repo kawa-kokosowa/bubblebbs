@@ -8,6 +8,7 @@
     {{ form.csrf_token() }}
     <label>Name: {{ form.name }}</label>
     <label>Message: {{ form.message }}</label>
+    {{ recaptcha() }}
     <input type="submit" value="Post!">
   </fieldset>
 </form>
