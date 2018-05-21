@@ -14,7 +14,10 @@ Features:
   * Trip meta pages exist as soon as the tripcode is used when creating a post!
     You can edit these pages by supplying a string which hashes to that
     tripcode! Shows posts by that tripcode, as well as post counts!
+  * Flags IPs which use a name with a tripcode that doesn't match the original
+    occurence of name's tripcode
   * Markdown support
+  * Google Recaptcha
   * Create pages
   * Word filter lets you not only filter words (also pattern matches on
     plurals), but "flag" IP addresses that use those words
