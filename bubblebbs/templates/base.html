@@ -1,8 +1,9 @@
 {% macro recaptcha() -%}
+{% if recaptcha_enabled %}
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
 <noscript>
-  <div>
+  <div class="g-recaptcha">
     <div style="width: 302px; height: 422px; position: relative;">
       <div style="width: 302px; height: 422px; position: absolute;">
         <iframe src="https://www.google.com/recaptcha/api/fallback?k={{ recaptcha_site_key }}"
@@ -22,6 +23,7 @@
     </div>
   </div>
 </noscript>
+{% endif %}
 {%- endmacro %}
 {% macro thread_permalink_summary(post) -%}
     <a href="/threads/{% if post.reply_to %}{{ post.reply_to }}#{% endif %}{{ post.id }}" class="permalink">#{{ post.id }}: {{ post.message[:140] | safe | striptags }}{% if post.message[140:] %}&hellip;{% endif %}</a>

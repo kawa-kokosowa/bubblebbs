@@ -3,6 +3,7 @@ import os
 import random
 import datetime
 
+import requests
 from flask import (
     Flask, redirect, render_template, url_for, send_from_directory, request, send_file, jsonify, make_response
 )
@@ -30,6 +31,7 @@ app.jinja_env.globals.update(
     complementary_color=templating.complementary_color,
     get_blotter_entries=templating.get_blotter_entries,
     get_stylesheet=templating.get_stylesheet,
+    recaptcha_enabled=config.RECAPTCHA_ENABLED,
     recaptcha_site_key=config.RECAPTCHA_SITE_KEY,
 )  # why not move this to templating?
 # TODO: may add filter in future
@@ -49,16 +51,18 @@ def config_db(key: str) -> str:
 
 
 def validate_recaptcha():
-    import requests
-    verify_result = requests.post(
-        'https://www.google.com/recaptcha/api/siteverify',
-        data={
-            'secret': '6Lc3-FkUAAAAAL-cl-zQA66aOFZD4ONGzQZdE-xh',
-            'response': request.form['g-recaptcha-response'],
-            'remoteip': request.remote_addr,
-        },
-    ).json()
-    return verify_result['success'] == True
+    if config.RECAPTCHA_ENABLED:
+        verify_result = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={
+                'secret': '6Lc3-FkUAAAAAL-cl-zQA66aOFZD4ONGzQZdE-xh',
+                'response': request.form['g-recaptcha-response'],
+                'remoteip': request.remote_addr,
+            },
+        ).json()
+        return verify_result['success'] == True
+    else:
+        return True
 
 
 # NOTE: this currently isn't being used by anything!
