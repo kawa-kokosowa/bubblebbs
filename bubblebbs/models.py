@@ -34,8 +34,10 @@ class ErrorPageException(Exception):
 
 
 class RemoteAddrIsBanned(ErrorPageException):
-    """The remote address {address} attempting to perform this action
-    was banned and thus prohibited from doing so.
+    """The remote address {address} attempted to perform an action
+    it has been banned/prohibited from performing.
+
+    Ban reason: {reason}
 
     """
 
@@ -277,13 +279,24 @@ class Post(db.Model):
 
                 try:
                     db.session.add(new_flagged_ip)
+                    db.session.commit()
+                    db.session.flush()
+                except IntegrityError:
+                    db.session.rollback()
+
+                try:
                     db.session.add(new_banned_ip)
                     db.session.commit()
                     db.session.flush()
                 except IntegrityError:
                     db.session.rollback()
 
-                raise RemoteAddrIsBanned(format_docstring={'address': request.remote_addr})
+                raise RemoteAddrIsBanned(
+                    format_docstring={
+                        'address': request.remote_addr,
+                        'reason': phrase.phrase,
+                    },
+                )
 
     @staticmethod
     def set_bump(form, reply_to, timestamp):
@@ -306,7 +319,7 @@ class Post(db.Model):
     def ban_check(form):
         ban = db.session.query(Ban).get(request.remote_addr)
         if ban:
-            raise RemoteAddrIsBanned(format_docstring={'address': ban.adddress})
+            raise RemoteAddrIsBanned(format_docstring={'address': ban.address, 'reason': ban.reason})
 
     # TODO: rename since now needs request for IP address
     @classmethod
