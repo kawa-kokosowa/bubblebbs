@@ -30,6 +30,7 @@ app.jinja_env.globals.update(
     complementary_color=templating.complementary_color,
     get_blotter_entries=templating.get_blotter_entries,
     get_stylesheet=templating.get_stylesheet,
+    recaptcha_site_key=config.RECAPTCHA_SITE_KEY,
 )  # why not move this to templating?
 # TODO: may add filter in future
 app.jinja_env.filters = {
