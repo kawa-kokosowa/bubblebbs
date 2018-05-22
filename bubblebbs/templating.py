@@ -6,6 +6,16 @@ from flask import request
 from . import models
 
 
+TRUNCATE_LENGTH = 140
+
+
+def truncate(some_string: str, length: int = TRUNCATE_LENGTH):
+    if len(some_string) > length:
+        return some_string[:length] + '&hellip;'
+    else:
+        return some_string
+
+
 def get_stylesheet():
     return request.cookies.get('stylesheet_url')
 

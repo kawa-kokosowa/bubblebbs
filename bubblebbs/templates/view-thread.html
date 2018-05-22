@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{% if post.headline %}{{ post.headline }} {% endif %}Thread #{{ post.id }}{% endblock %}
+{% block title %}{% if post.headline %}{{ truncate(post.headline, 60) }} {% endif %}Thread #{{ post.id }}{% endblock %}
 
 {% block content %}
 
@@ -7,7 +7,7 @@
     <article>
         <section class="op">
             <header>
-                <h1>{% if post.headline %}{{ post.headline }}&mdash;{% endif %}Thread #{{ post.id }} by {{ post_name(post) }}{% if post.locked %}🔒{% endif %}{% if post.permasage %}🌿{% endif %}</h1>
+                <h1>{% if post.headline %}{{ truncate(post.headline, 60) | safe }}&mdash;{% endif %}Thread #{{ post.id }} by {{ post_name(post) }}{% if post.locked %}🔒{% endif %}{% if post.permasage %}🌿{% endif %}</h1>
                 <p class="meta">{{ since_bumptime(post.timestamp, post.id) | safe }}</p>
             </header>
             <div class="message">{{ post.message | safe }}</div>

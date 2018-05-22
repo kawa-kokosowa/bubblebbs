@@ -332,8 +332,9 @@ class Post(db.Model):
     @staticmethod
     def get_headline(message: str):
         headline = message.split('\n', 1)[0]
-        if headline:
-            return headline
+        cleaned_headline = re.sub(r'<.*?>', '', headline)
+        if cleaned_headline:
+            return cleaned_headline
         else:
             return None
 
@@ -357,6 +358,7 @@ class Post(db.Model):
         if reply_to and db.session.query(Post).get(reply_to).locked:
             raise Exception('This thread is locked. You cannot reply.')
 
+        # FIXME: should sanitize first?
         # Prepare info for saving to DB
         headline = cls.get_headline(form.message.data)
         name, tripcode = cls.make_tripcode(form)
