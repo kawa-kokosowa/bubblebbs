@@ -2,7 +2,7 @@
 {% block title %}{{ tripcode }} (Trip Meta){% endblock %}
 
 {% block content %}
-<form action="/trip-meta/{{ quote(tripcode) }}/edit" method="POST" enctype="multipart/form-data">
+<form action="/trip-meta/{{ tripcode }}/edit" method="POST" enctype="multipart/form-data">
   <fieldset>
     <legend>Edit tripcode meta for {{ tripcode }}</legend>
     {{ form.csrf_token() }}
