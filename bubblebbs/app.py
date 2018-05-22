@@ -31,6 +31,7 @@ app.jinja_env.globals.update(
     color_hash=ColorHash,
     quote=quote,
     complementary_color=templating.complementary_color,
+    truncate=templating.truncate,
     get_blotter_entries=templating.get_blotter_entries,
     get_stylesheet=templating.get_stylesheet,
     recaptcha_enabled=config.RECAPTCHA_ENABLED,

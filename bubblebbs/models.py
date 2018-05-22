@@ -114,6 +114,7 @@ class Post(db.Model):
     ip_address = db.Column(db.String(120), nullable=False)
     locked = db.Column(db.Boolean(), default=False, nullable=False)
     verified = db.Column(db.Boolean(), default=False, nullable=False)
+    headline = db.Column(db.String(140))
     permasage = db.Column(db.Boolean(), default=False, nullable=False)
     tripcode = db.Column(db.String(64))
     message = db.Column(db.String(2000), nullable=False, unique=True)
@@ -328,6 +329,15 @@ class Post(db.Model):
         message = cls.word_filter(message)
         return message
 
+    @staticmethod
+    def get_headline(message: str):
+        headline = message.split('\n', 1)[0]
+        cleaned_headline = re.sub(r'<.*?>', '', headline)
+        if cleaned_headline:
+            return cleaned_headline
+        else:
+            return None
+
     # TODO: rename since now needs request for IP address
     @classmethod
     def from_form(cls, form):
@@ -348,7 +358,9 @@ class Post(db.Model):
         if reply_to and db.session.query(Post).get(reply_to).locked:
             raise Exception('This thread is locked. You cannot reply.')
 
+        # FIXME: should sanitize first?
         # Prepare info for saving to DB
+        headline = cls.get_headline(form.message.data)
         name, tripcode = cls.make_tripcode(form)
         matches_original_use = cls.name_tripcode_matches_original_use(name, tripcode)
         verified = matches_original_use
@@ -361,6 +373,7 @@ class Post(db.Model):
         # Save!
         new_post = cls(
             name=name,
+            headline=headline,
             tripcode=tripcode,
             timestamp=timestamp,
             message=message,
