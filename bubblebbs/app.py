@@ -1,6 +1,7 @@
 # TODO: rename this view.py? put app factory in another file?
 import os
 import random
+from urllib.parse import quote
 import datetime
 
 import requests
@@ -28,6 +29,7 @@ app.jinja_env.globals.update(
     get_pages=templating.get_pages,
     hash_to_emoji=hash_to_emoji,
     color_hash=ColorHash,
+    quote=quote,
     complementary_color=templating.complementary_color,
     get_blotter_entries=templating.get_blotter_entries,
     get_stylesheet=templating.get_stylesheet,

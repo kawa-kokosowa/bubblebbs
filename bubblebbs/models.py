@@ -255,8 +255,8 @@ class Post(db.Model):
         else:
             salt = config.SECRET_SALT + name
 
-        unfiltered_tripcode = str(
-            base64.b64encode(
+        tripcode = str(
+            base64.a85encode(
                 scrypt.hash(
                     name + config.SECRET_KEY + unhashed_tripcode,
                     salt,
@@ -264,7 +264,6 @@ class Post(db.Model):
                 ),
             ),
         )[2:-1]
-        tripcode = unfiltered_tripcode.replace('/', '*').replace('+', '.').replace('=', '~')
         return name, tripcode
 
     @staticmethod

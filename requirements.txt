@@ -18,7 +18,7 @@ mdx-bleach==0.1.2
 more-itertools==4.1.0
 pluggy==0.6.0
 py==1.5.3
-pymojihash==0.2.0
+pymojihash==0.4.0
 pytest==3.5.0
 redis==2.10.6
 requests==2.6.0
