@@ -1,7 +1,7 @@
 # bubblebbs
 
 [![Build
-Status](https://travis-ci.org/lily-fyi/bubblebbs.svg?branch=master)](https://travis-ci.org/lily-fyi/bubblebbs)
+Status](https://travis-ci.org/lily-mayfield/bubblebbs.svg?branch=master)](https://travis-ci.org/lily-mayfield/bubblebbs)
 
 Text BBS/message board which runs [bubblebbs.cafe](http://bubblebbs.cafe).
 
