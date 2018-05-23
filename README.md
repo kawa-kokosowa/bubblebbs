@@ -20,7 +20,7 @@ Features:
     occurence of name's tripcode
   * Prefixes "verified" names with a green checkmark. Verified names are posts
     which have a tripcode matching the tripcode of the first post with said name.
-  * Markdown support
+  * Markdown support, optional headline syntax
   * Google Recaptcha
   * Create pages
   * Word filter lets you not only filter words (also pattern matches on
