@@ -340,7 +340,7 @@ class Post(db.Model):
         headline = cls.word_filter(headline, False)
         cleaned_headline = re.sub(r'<.*?>', '', headline)
         if cleaned_headline:
-            return cleaned_headline
+            return cleaned_headline.strip()
         else:
             return None
 

@@ -20,7 +20,7 @@
       {% for reply in replies %}
           <article class="reply" id="{{ reply.id }}">
             <header>
-                <h1>{% if reply.headline %}{{ truncate(reply.headline, 60) | safe }}&mdash;{% endif %}Reply #{{ reply.id }}</h1>
+                <h1>Reply #{{ reply.id }}{% if reply.headline %}: {{ truncate(reply.headline, 60) | safe }}{% endif %}</h1>
                 <p class="meta">By {{ post_name(reply) }} {{ since_bumptime(reply.timestamp, post.id, reply.id) | safe }}</p>
             </header>
             <div class="message">{{ reply.message | safe }}</div>
