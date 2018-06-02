@@ -177,6 +177,7 @@ a:hover {
   text-overflow: ellipsis;
   overflow: hidden;
   display: inline-block;
+  vertical-align: top;
 }
 
 .list-thread .meta {
