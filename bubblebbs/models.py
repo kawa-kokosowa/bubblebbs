@@ -278,7 +278,7 @@ class Post(db.Model):
         return tip_link, tip_domain
 
     @staticmethod
-    def word_filter(message):
+    def word_filter(message, flag_if_filtered=True):
         # Finally let's do some wordfiltering. Wordfilters are useful because
         # you can catch bad words and flag users that use them.
         message_before_filtering = message
@@ -290,7 +290,7 @@ class Post(db.Model):
             # plus indicative of wordfiltering happening.
             message = find.sub(word_filter.replace.upper(), message)
 
-        if message_before_filtering != message:
+        if flag_if_filtered and (message_before_filtering != message):
             FlaggedIps.new(request.remote_addr, 'word filter')
 
         return message
@@ -329,10 +329,10 @@ class Post(db.Model):
         message = cls.word_filter(message)
         return message
 
-    @staticmethod
-    def get_headline(message: str):
+    @classmethod
+    def get_headline(cls, message: str):
         headline = message.split('\n', 1)[0]
-        headline = cls.word_filter(headline)
+        headline = cls.word_filter(headline, False)
         cleaned_headline = re.sub(r'<.*?>', '', headline)
         if cleaned_headline:
             return cleaned_headline
