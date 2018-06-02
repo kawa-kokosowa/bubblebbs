@@ -1,6 +1,6 @@
 # Contributing to BubbleBBS
 
-Hello this is @lily-mayfield and I want to thank you for reading this file.
+Hello this is [Lily](https://github.com/lily-mayfield) and I want to thank you for reading this file.
 
 ## Git
 
