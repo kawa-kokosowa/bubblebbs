@@ -332,6 +332,9 @@ class Post(db.Model):
     @classmethod
     def get_headline(cls, message: str):
         headline = message.split('\n', 1)[0]
+        if len(headline) == 1:
+            return None
+
         headline = cls.word_filter(headline, False)
         cleaned_headline = re.sub(r'<.*?>', '', headline)
         if cleaned_headline:
