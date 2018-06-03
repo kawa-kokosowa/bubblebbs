@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Latest Bumps{% endblock %}
+{% block title %}{% if request.args.get('search') %}Search {{ request.args['search'] }}, {% endif %}{% if current_page > 1 %}Page {{ current_page }}, {% endif %}Threads{% endblock %}
 
 {% block content %}
 <div class="list-threads">
