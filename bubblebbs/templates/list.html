@@ -15,4 +15,17 @@
         </article>
         {% endfor %}
 </div>
+{% if total_pages > 1 %}
+<nav class="pagination">
+    <ol>
+    {% for page_number in range(1, total_pages + 1) %}
+        <li{% if current_page == page_number %} class="current-page"{% endif %}>
+            {% set query_string_args = dict(request.args) -%}
+            {% set _ = query_string_args.update({'page': page_number}) -%}
+            <a href="{{ url_for('list_threads', **query_string_args) }}">{{ page_number }}</a>
+        </li>
+    {% endfor %}
+    </ol>
+</nav>
+{% endif %}
 {% endblock %}

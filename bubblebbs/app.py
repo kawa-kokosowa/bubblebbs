@@ -90,25 +90,32 @@ def list_threads():
 
     """
 
-    # full text search
     search_for_this_text = request.args.get('search')
     if search_for_this_text:
         like_query = '%' + search_for_this_text + '%'
-        posts = (
+        query = (
             models.Post.query.filter(
                 models.Post.message.like(like_query),
             )
-            .order_by(models.Post.bumptime.desc())
-            .all()
         )
     else:
-        posts = (
+        query = (
             models.Post.query.filter(models.Post.reply_to == None)
-            .order_by(models.Post.bumptime.desc())
-            .all()
         )
 
-    for post in posts:
+    current_page = request.args.get('page', type=int) or 1
+    paginated_posts = (
+        query
+        .order_by(models.Post.bumptime.desc())
+        .paginate(
+            current_page,
+            per_page=config.POSTS_PER_PAGE,
+        )
+    )
+    total_pages = paginated_posts.pages
+    posts_for_this_page = paginated_posts.items
+
+    for post in posts_for_this_page:
         reply_query = (
             models.Post.query
             .filter(models.Post.reply_to == post.id)
@@ -119,7 +126,9 @@ def list_threads():
     return render_template(
         'list.html',
         form=forms.NewPostForm(),
-        posts=posts,
+        posts=posts_for_this_page,
+        total_pages=total_pages,
+        current_page=current_page,
     )
 
 

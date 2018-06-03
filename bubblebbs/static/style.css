@@ -642,6 +642,29 @@ th.replies {
   padding: 0 20px 1.5rem 20px;
 }
 
+.pagination {
+  padding: 3rem 20px 1.5rem;
+  text-align: center;
+}
+
+.pagination ol {
+  list-style-type: none;
+}
+
+.pagination li {
+  display: inline-block;
+}
+
+.pagination a {
+  padding: 0 10px;
+  background-color: var(--soft-grey);
+}
+
+.pagination .current-page a {
+  background-color: #fff;
+  font-weight: bold;
+}
+
 @media screen and (max-width: 700px)
 {
   html,
