@@ -110,6 +110,7 @@ class PostModelView(MyModelView):
         'tripcode',
         'message',
     )
+    column_default_sort = ('id', True)
 
 
 class PageModelView(MyModelView):
