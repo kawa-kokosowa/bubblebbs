@@ -180,14 +180,46 @@ class Post(db.Model):
     def reference_links(message, reply_to: int = None) -> str:
         """Parse @id links"""
 
+        # first see if referenced id is a thread or reply
+        def check_referenced(post_referenced: int):
+            post_referenced = Post.query.get(post_referenced)
+            if post_referenced.reply_to:
+                return '%d#%d' % (post_referenced.reply_to, post_referenced.id)
+            else:
+                return str(post_referenced.id)
+
         if not reply_to:
             return message
 
         pattern = re.compile('\@([0-9]+)')
-        message_with_links = pattern.sub(
-            r'<a href="/threads/%d#\1" class="reflink">@\1</a>' % reply_to,
-            message,
-        )
+        for match in re.finditer(pattern, message):
+            at_number = int(match.group(1))
+
+            # FIXME: what if not found?
+            # Construct the link based on determining if this is
+            # a reference to a thread or if it's a reference to a reply
+            post_referenced = Post.query.get(at_number)
+            if not post_referenced:
+                valid = False
+            elif post_referenced.reply_to:
+                link = '%d#%d' % (post_referenced.reply_to, post_referenced.id)
+                valid = True
+            else:
+                link = str(post_referenced.id)
+                valid = True
+
+            replace_pattern = re.compile('\@%d' % at_number)
+
+            if valid:
+                replace_with = r'<a href="/threads/%s" class="reflink">@%d</a>' % (link, at_number)
+            else:
+                replace_with = r'<span class="reflink reflink-invalid">@%d</span>' % at_number
+
+            message_with_links = replace_pattern.sub(
+                replace_with,
+                message,
+            )
+
         return message_with_links
 
     # FIXME: dangerous because untested for vulns

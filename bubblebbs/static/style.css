@@ -306,6 +306,11 @@ pre {
   font-weight: bold;
 }
 
+
+.reflink-invalid {
+  text-decoration: line-through;
+}
+
 .brand {
   text-align: center;
 }
