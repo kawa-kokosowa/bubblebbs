@@ -7,7 +7,7 @@
     <article>
         <section class="op">
             <header>
-                <h1>{% if post.headline %}{{ truncate(post.headline, 60) | safe }}&mdash;{% endif %}Thread #{{ post.id }} {% if post.locked %}🔒{% endif %}{% if post.permasage %}🌿{% endif %}</h1>
+                <h1>{% if post.headline %}{{ truncate(post.headline, 60) | safe }}&mdash;{% endif %}#{{ post.id }}{% if post.locked %}🔒{% endif %}{% if post.permasage %}🌿{% endif %}</h1>
                 <p class="meta">
                     By {{ post_name(post) }}
                     {{ since_bumptime(post.timestamp, post.id) | safe }}
@@ -20,7 +20,7 @@
       {% for reply in replies %}
           <article class="reply" id="{{ reply.id }}">
             <header>
-                <h1>Reply #{{ reply.id }}{% if reply.headline %}: {{ truncate(reply.headline, 60) | safe }}{% endif %}</h1>
+                <h1>#{{ reply.id }}{% if reply.headline %}: {{ truncate(reply.headline, 60) | safe }}{% endif %}</h1>
                 <p class="meta">By {{ post_name(reply) }} {{ since_bumptime(reply.timestamp, post.id, reply.id) | safe }}</p>
             </header>
             <div class="message">{{ reply.message | safe }}</div>
