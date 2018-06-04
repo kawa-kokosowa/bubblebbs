@@ -1,6 +1,7 @@
 # FIXME: primary key being avoided because you have to do
 # some annoying copypaste code to get primary keys to show
 import os
+import copy
 import re
 import base64
 import zlib
@@ -12,6 +13,7 @@ import urllib.parse
 
 import scrypt
 import markdown
+from bs4 import BeautifulSoup
 from mdx_bleach.extension import BleachExtension
 from mdx_unimoji import UnimojiExtension
 from markdown.extensions.footnotes import FootnoteExtension
@@ -135,6 +137,30 @@ class Post(db.Model):
         pass
 
     @staticmethod
+    def add_domains_to_link_texts(html_message: str):
+        soup = BeautifulSoup(html_message, 'html5lib')
+        for anchor in soup.find_all('a'):
+            if anchor.has_attr('class') and ('reflink' in anchor['class']):
+                continue
+
+            new_tag = copy.copy(anchor)
+            href_parts = urlparse(anchor['href'])
+
+            if href_parts.netloc:
+                link_type = 'external-link'
+                domain = href_parts.netloc
+            else:
+                link_type = 'internal-link'
+                domain = 'internal link'
+
+            new_tag['class'] = new_tag.get('class', []) + [link_type]
+            domain = href_parts.netloc if href_parts.netloc else 'internal link'
+            new_tag.string = '%s (%s)' % (anchor.string, domain)
+            anchor.replace_with(new_tag)
+
+        return str(soup)
+
+    @staticmethod
     def name_tripcode_matches_original_use(name: str, tripcode: str) -> bool:
         """Verify that this usage of `name` has the correct
         tripcode as when `name` was originally used.
@@ -149,19 +175,17 @@ class Post(db.Model):
         )
         return (not first_post_using_name) or first_post_using_name.tripcode == tripcode
 
+    # TODO: link cross-threads if needbe
     @staticmethod
-    def reference_links(form) -> str:
-        """Parse >>id links"""
+    def reference_links(message, reply_to: int = None) -> str:
+        """Parse @id links"""
 
-        if not form.reply_to.data:
-            return form.message.data
+        if not reply_to:
+            return message
 
-        message = form.message.data
-        reply_to = int(form.reply_to.data)
-
-        pattern = re.compile('\>\>([0-9]+)')
+        pattern = re.compile('\@([0-9]+)')
         message_with_links = pattern.sub(
-            r'<a href="/threads/%d#\1">&gt;&gt;\1</a>' % reply_to,
+            r'<a href="/threads/%d#\1" class="reflink">@\1</a>' % reply_to,
             message,
         )
         return message_with_links
@@ -219,7 +243,7 @@ class Post(db.Model):
                     smart_ellipses=True,
                     substitutions={},
                 ),
-                UnimojiExtension(),
+                UnimojiExtension(),  # FIXME: add in configurable emojis, etc.
                 'markdown.extensions.nl2br',
                 'markdown.extensions.footnotes',
                 'markdown.extensions.toc',
@@ -326,8 +350,10 @@ class Post(db.Model):
     def mutate_message(cls, form, timestamp):
         """Change the message in various ways before saving to DB."""
 
-        message = cls.reference_links(form)
+        message = form.message.data
         message = cls.parse_markdown(timestamp, message)
+        message = cls.reference_links(message, int(form.reply_to.data))
+        message = cls.add_domains_to_link_texts(message)
         message = cls.word_filter(message)
         return message
 
@@ -339,6 +365,7 @@ class Post(db.Model):
         else:
             headline = message_parts[0]
 
+        headline = str(BeautifulSoup(headline, 'html5lib').get_text())
         headline = cls.word_filter(headline, False)
         cleaned_headline = re.sub(r'<.*?>', '', headline)
         if cleaned_headline:
@@ -346,7 +373,6 @@ class Post(db.Model):
         else:
             return None
 
-    # TODO: rename since now needs request for IP address
     @classmethod
     def from_form(cls, form):
         """Create and return a Post.
@@ -368,7 +394,6 @@ class Post(db.Model):
 
         # FIXME: should sanitize first?
         # Prepare info for saving to DB
-        headline = cls.get_headline(form.message.data)
         name, tripcode = cls.make_tripcode(form)
         matches_original_use = cls.name_tripcode_matches_original_use(name, tripcode)
         verified = matches_original_use
@@ -377,6 +402,7 @@ class Post(db.Model):
 
         timestamp = datetime.datetime.utcnow()
         message = cls.mutate_message(form, timestamp)
+        headline = cls.get_headline(message)
 
         # Save!
         new_post = cls(
