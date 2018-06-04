@@ -456,6 +456,10 @@ class Post(db.Model):
             db.session.flush()
         except (InvalidRequestError, IntegrityError) as e:
             db.session.rollback()
+            FlaggedIps.new(
+                ip_address_to_flag=request.remote_addr,
+                flag_reason='Duplicate post!',
+            )
             raise DuplicateMessage()
 
         # TODO: after save method?
