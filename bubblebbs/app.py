@@ -356,7 +356,7 @@ with app.app_context():
 
     # Add views
     admin_.add_view(moderate.AdminUserModelView(models.User, models.db.session))
-    admin_.add_view(moderate.MyModelView(models.Post, models.db.session))
+    admin_.add_view(moderate.PostModelView(models.Post, models.db.session))
     admin_.add_view(moderate.BanView(models.Ban, models.db.session))
     admin_.add_view(moderate.MyModelView(models.BlotterEntry, models.db.session))
     admin_.add_view(moderate.MyModelView(models.FlaggedIps, models.db.session))

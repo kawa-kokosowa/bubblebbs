@@ -90,8 +90,26 @@ def init_login(app):
 class MyModelView(sqla.ModelView):
     column_display_pk = True
 
+    def _ip_link(view, context, model, name):
+        return Markup(
+            '<a href="/admin/post?flt4_16=%s">%s</a>' % (model.ip_address, model.ip_address),
+        )
+    column_formatters = {
+        'ip_address': _ip_link,
+    }
+
     def is_accessible(self):
         return login.current_user.is_authenticated
+
+
+class PostModelView(MyModelView):
+    column_filters = (
+        'id',
+        'name',
+        'ip_address', 
+        'tripcode',
+        'message',
+    )
 
 
 class PageModelView(MyModelView):
