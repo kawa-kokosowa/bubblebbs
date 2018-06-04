@@ -192,6 +192,7 @@ class Post(db.Model):
             return message
 
         pattern = re.compile('\@([0-9]+)')
+        message_with_links = message
         for match in re.finditer(pattern, message):
             at_number = int(match.group(1))
 
@@ -217,7 +218,7 @@ class Post(db.Model):
 
             message_with_links = replace_pattern.sub(
                 replace_with,
-                message,
+                message_with_links,
             )
 
         return message_with_links
