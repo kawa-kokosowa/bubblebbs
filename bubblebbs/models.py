@@ -13,6 +13,7 @@ import urllib.parse
 import scrypt
 import markdown
 from mdx_bleach.extension import BleachExtension
+from mdx_unimoji import UnimojiExtension
 from markdown.extensions.footnotes import FootnoteExtension
 from markdown.extensions.smarty import SmartyExtension
 from markdown.extensions.wikilinks import WikiLinkExtension
@@ -218,6 +219,7 @@ class Post(db.Model):
                     smart_ellipses=True,
                     substitutions={},
                 ),
+                UnimojiExtension(),
                 'markdown.extensions.nl2br',
                 'markdown.extensions.footnotes',
                 'markdown.extensions.toc',
