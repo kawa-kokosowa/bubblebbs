@@ -385,7 +385,7 @@ class Post(db.Model):
 
         message = form.message.data
         message = cls.parse_markdown(timestamp, message)
-        message = cls.reference_links(message, int(form.reply_to.data))
+        message = cls.reference_links(message, int(form.reply_to.data) if form.reply_to.data else None)
         message = cls.add_domains_to_link_texts(message)
         message = cls.word_filter(message)
         return message
