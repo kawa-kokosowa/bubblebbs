@@ -315,6 +315,13 @@ pre {
   text-align: center;
 }
 
+.brand-image {
+  vertical-align: top;
+  height: 2.8rem;
+  display: inline-block;
+  width: auto;
+}
+
 .brand p {
   color: var(--hard-grey);
   font-style: italic;
