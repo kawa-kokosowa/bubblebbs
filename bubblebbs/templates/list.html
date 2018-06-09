@@ -7,9 +7,10 @@
         <article class="list-thread">
             <h1>{{ thread_permalink_summary(post) }}</h1>
             <p class="meta">
-                By {{ post_name(post) }} &middot;
+                {{ post_name(post) }} &middot;
                 ⬆ {{ since_bumptime(post.bumptime) | safe }} &middot;
-                ↪️ {{ post.reply_count }}{% if post.last_reply %}, <a class="list-thread-last-reply" href="/threads/{{ post.last_reply.reply_to}}#{{ post.last_reply.id }}">#{{ post.last_reply.id }}{% if post.last_reply.headline %}&mdash;{{ truncate(post.last_reply.headline, 40) | striptags }}{% endif %}</a>{%endif %}
+                ↪️ {{ post.reply_count }}{% if post.last_reply %},
+                <span class="list-thread-last-reply"><a href="/threads/{{ post.last_reply.reply_to}}#{{ post.last_reply.id }}">#{{ post.last_reply.id }}&mdash;{{ post_summary(post.last_reply, 40) }}</a> by {{ post_name_summarized(post.last_reply) }}</span>{%endif %}
                 {% if post.locked %} &middot; 🔒{% endif %}{% if post.permasage %} &middot; 🌿{% endif %}
             </p>
         </article>

@@ -2,6 +2,7 @@
 import re
 
 from flask import request
+from bs4 import BeautifulSoup
 
 from . import models
 
@@ -9,11 +10,18 @@ from . import models
 TRUNCATE_LENGTH = 140
 
 
-def truncate(some_string: str, length: int = TRUNCATE_LENGTH):
+def truncate(some_string: str, length: int = None):
+    length = length if length else TRUNCATE_LENGTH
     if len(some_string) > length:
-        return some_string[:length] + '&hellip;'
+        return some_string[:length] + '…'
     else:
         return some_string
+
+
+# TODO: no need for headline field...
+# Strip HTML...
+def post_summary(post, length=None):
+    return truncate(BeautifulSoup(post.message).find().get_text().split('\n')[0], length=length)
 
 
 def get_stylesheet():

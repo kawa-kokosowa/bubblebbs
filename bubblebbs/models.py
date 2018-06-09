@@ -117,7 +117,6 @@ class Post(db.Model):
     ip_address = db.Column(db.String(120), nullable=False)
     locked = db.Column(db.Boolean(), default=False, nullable=False)
     verified = db.Column(db.Boolean(), default=False, nullable=False)
-    headline = db.Column(db.String(140))
     permasage = db.Column(db.Boolean(), default=False, nullable=False)
     tripcode = db.Column(db.String(64))
     message = db.Column(db.String(2000), nullable=False, unique=True)
@@ -391,22 +390,6 @@ class Post(db.Model):
         return message
 
     @classmethod
-    def get_headline(cls, message: str):
-        message_parts = message.split('\n', 1)
-        if len(message_parts) == 1:
-            return None
-        else:
-            headline = message_parts[0]
-
-        headline = str(BeautifulSoup(headline, 'html5lib').get_text())
-        headline = cls.word_filter(headline, False)
-        cleaned_headline = re.sub(r'<.*?>', '', headline)
-        if cleaned_headline:
-            return cleaned_headline.strip()
-        else:
-            return None
-
-    @classmethod
     def from_form(cls, form):
         """Create and return a Post.
 
@@ -435,12 +418,10 @@ class Post(db.Model):
 
         timestamp = datetime.datetime.utcnow()
         message = cls.mutate_message(form, timestamp)
-        headline = cls.get_headline(message)
 
         # Save!
         new_post = cls(
             name=name,
-            headline=headline,
             tripcode=tripcode,
             timestamp=timestamp,
             message=message,

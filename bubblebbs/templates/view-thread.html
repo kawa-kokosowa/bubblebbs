@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{% if post.headline %}{{ truncate(post.headline, 60) }} {% endif %}Thread #{{ post.id }}{% endblock %}
+{% block title %}{{ post_summary(post, 60) }} (Thread #{{ post.id }}){% endblock %}
 
 {% block content %}
 
@@ -20,7 +20,7 @@
       {% for reply in replies %}
           <article class="reply" id="{{ reply.id }}">
             <header>
-                <h1>#{{ reply.id }}{% if reply.headline %}: {{ truncate(reply.headline, 60) | safe }}{% endif %}</h1>
+                <h1>#{{ reply.id }}: {{ post_summary(reply, 60) }}</h1>
                 <p class="meta">By {{ post_name(reply) }} {{ since_bumptime(reply.timestamp, post.id, reply.id) | safe }}</p>
             </header>
             <div class="message">{{ reply.message | safe }}</div>

@@ -24,6 +24,7 @@ from . import templating
 
 app = Flask(__name__)
 app.config.from_object(config)
+# TODO: move this all to templating.py
 app.jinja_env.globals.update(
     since_bumptime=templating.since_bumptime,
     get_pages=templating.get_pages,
@@ -31,6 +32,7 @@ app.jinja_env.globals.update(
     color_hash=ColorHash,
     quote=quote,
     complementary_color=templating.complementary_color,
+    post_summary=templating.post_summary,
     truncate=templating.truncate,
     get_blotter_entries=templating.get_blotter_entries,
     get_stylesheet=templating.get_stylesheet,

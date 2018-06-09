@@ -175,15 +175,23 @@ a:hover {
   max-width: 60rem;
   white-space: nowrap;
   text-overflow: ellipsis;
+  font-size: 0.8rem;
   overflow: hidden;
   display: inline-block;
   color: var(--hard-grey);
+  font-size: 0.8rem;
   vertical-align: top;
+}
+
+.list-thread-last-reply .tripcode {
+  opacity: 0.8;
 }
 
 .list-thread .meta {
   margin: 0;
-  font-size: 1rem;
+}
+
+.list-thread .meta .tripcode:first-child {
 }
 
 #list-threads th.list-replies {
@@ -381,7 +389,6 @@ legend {
 
 .meta {
   color: var(--hard-grey);
-  font-size: 0.75rem;
 }
 
 .search-box {
