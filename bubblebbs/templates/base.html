@@ -26,7 +26,7 @@
 {% endif %}
 {%- endmacro %}
 {% macro thread_permalink_summary(post) -%}
-    <a href="/threads/{% if post.reply_to %}{{ post.reply_to }}#{% endif %}{{ post.id }}" class="permalink">#{{ post.id }}: {{ truncate(post.headline if post.headline else post.message) | striptags }}</a>
+    <a href="/threads/{% if post.reply_to %}{{ post.reply_to }}#{% endif %}{{ post.id }}" class="permalink">#{{ post.id }}: {{ post_summary(post) }}</a>
 {%- endmacro %}
 {% macro post_name(post) -%}
     {% if post.tripcode %}<a href="/trip-meta/{{ post.tripcode }}" title="{{ post.tripcode }}" class="tripcode{% if post.verified %} tripcode-verified{% endif %}" style="background-color: {{ color_hash(post.tripcode).hex }}; color: #{{ complementary_color(color_hash(post.tripcode).hex) }}">{{ post.name }}<span class="tripcode-emoji">{{ hash_to_emoji(post.tripcode, no_flags=True) }}</span></a>{% elif post.name %}{{ post.name }}{% else %}Anonymous{% endif %}
