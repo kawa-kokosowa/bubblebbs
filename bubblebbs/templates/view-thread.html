@@ -7,7 +7,7 @@
     <article>
         <section class="op">
             <header>
-                <h1>{% if post.headline %}{{ truncate(post.headline, 60) | safe }}&mdash;{% endif %}#{{ post.id }}{% if post.locked %}🔒{% endif %}{% if post.permasage %}🌿{% endif %}</h1>
+                <h1>#{{ post.id }}: {{ post_summary(post, 60) }}{% if post.locked %}🔒{% endif %}{% if post.permasage %}🌿{% endif %}</h1>
                 <p class="meta">
                     By {{ post_name(post) }}
                     {{ since_bumptime(post.timestamp, post.id) | safe }}
