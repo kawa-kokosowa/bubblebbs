@@ -88,6 +88,32 @@ class TripMeta(db.Model):
 class BannablePhrases(db.Model):
     phrase = db.Column(db.String(100), primary_key=True)
 
+    @classmethod
+    def check_for_bannable_phrases(cls, message: str):
+        """
+
+        Raises:
+            RemoteAddrIsBanned: When `message` contains a banned
+                phrase, the IP is banned, flagged, and this
+                exception is raised with the details of the ban.
+
+        """
+
+        bannable_phrases = db.session.query(cls).all()
+        for phrase in bannable_phrases:
+            if phrase.phrase in message:
+                FlaggedIps.new(request.remote_addr, 'bannable phrase')
+                Ban.new(request.remote_addr, 'bannable phrase: ' + phrase.phrase)
+
+                # TODO: weird use of an exception...
+                raise RemoteAddrIsBanned(
+                    format_docstring={
+                        'address': request.remote_addr,
+                        'reason': phrase.phrase,
+                    },
+                )
+
+
 
 class FlaggedIps(db.Model):
     """Keeps track of which IPs have exhibited "bad behavior."
@@ -354,23 +380,6 @@ class Post(db.Model):
         return message
 
     @staticmethod
-    def bannable_phrases(message: str):
-        # Check if any banned phrases are in this text, and if so,
-        # ban this user and don't make post!
-        bannable_phrases = db.session.query(BannablePhrases).all()
-        for phrase in bannable_phrases:
-            if phrase.phrase in message:
-                FlaggedIps.new(request.remote_addr, 'bannable phrase')
-                Ban.new(request.remote_addr, 'bannable phrase: ' + phrase.phrase)
-
-                raise RemoteAddrIsBanned(
-                    format_docstring={
-                        'address': request.remote_addr,
-                        'reason': phrase.phrase,
-                    },
-                )
-
-    @staticmethod
     def set_bump(form, reply_to, timestamp):
         if reply_to and not form.sage.data:
             original = db.session.query(Post).get(reply_to)
@@ -402,7 +411,8 @@ class Post(db.Model):
 
         # First the things which woudl prevent the post from being made
         Ban.ban_check(request.remote_addr)
-        cls.bannable_phrases(form.message.data)
+        BannablePhrases.check_for_bannable_phrases(form.message.data)
+        BannablePhrases.check_for_bannable_phrases(form.name.data)
 
         reply_to = int(form.reply_to.data) if form.reply_to.data else None
         if reply_to and db.session.query(Post).get(reply_to).locked:
