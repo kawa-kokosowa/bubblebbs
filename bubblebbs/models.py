@@ -205,17 +205,6 @@ class Post(db.Model):
     def reference_links(message, reply_to: int = None) -> str:
         """Parse @id links"""
 
-        # first see if referenced id is a thread or reply
-        def check_referenced(post_referenced: int):
-            post_referenced = Post.query.get(post_referenced)
-            if post_referenced.reply_to:
-                return '%d#%d' % (post_referenced.reply_to, post_referenced.id)
-            else:
-                return str(post_referenced.id)
-
-        if not reply_to:
-            return message
-
         pattern = re.compile('\@([0-9]+)')
         message_with_links = message
         for match in re.finditer(pattern, message):
