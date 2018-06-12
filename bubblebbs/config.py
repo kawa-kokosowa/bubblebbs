@@ -20,3 +20,13 @@ SITE_FOOTER = os.environ.get(
 )
 
 RATELIMIT_STORAGE_URL = os.environ.get('BBBS_RATELIMIT_STORAGE_URL', 'redis://localhost:6379/1')
+RATELIMIT_DEFAULT = ["400 per day", "100 per hour"]
+RATELIMIT_ENABLED = True
+RATELIMIT_LIST_THREADS = "20 per minute, 1 per second"
+RATELIMIT_VIEW_SPECIFIC_POST = "20 per minute, 1 per second"
+RATELIMIT_NEW_REPLY = "20 per hour, 1 per second, 2 per minute"
+RATELIMIT_VIEW_TRIP_META = "50 per hour, 15 per minute"
+RATELIMIT_EDIT_TRIP_META = "60 per hour, 1 per second, 4 per minute"
+RATELIMIT_MANAGE_COOKIE = '60 per hour, 1 per second, 7 per minute'
+RATELIMIT_CREATE_THREAD = '7 per hour, 1 per minute'
+RATELIMIT_NEW_THREAD_FORM = '60 per hour, 1 per second'

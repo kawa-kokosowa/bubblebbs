@@ -46,7 +46,6 @@ app.jinja_env.filters = {
 limiter = Limiter(
     app,
     key_func=get_remote_address,
-    default_limits=["400 per day", "100 per hour"]
 )
 
 
@@ -82,23 +81,8 @@ def ratelimit_handler(e):
     )
 
 
-# NOTE: this currently isn't being used by anything!
-@app.route("/search-json", methods=['GET'])
-def search_json():
-    search_for_this_text = request.args.get('search')
-    like_query = '%' + search_for_this_text + '%'
-    posts = (
-        models.Post.query.filter(
-            models.Post.message.like(like_query),
-        )
-        .order_by(models.Post.bumptime.desc())
-        .all()
-    )
-    return jsonify([dict(p) for p in posts])
-
-
 @app.route("/", methods=['GET'])
-@limiter.limit("30 per minute")
+@limiter.limit(config.RATELIMIT_LIST_THREADS)
 def list_threads():
     """View threads by bumptime in a list.
 
@@ -148,7 +132,7 @@ def list_threads():
 
 # FIXME: check if reply or not for error/404, else...
 @app.route("/threads/<int:post_id>")
-@limiter.limit("45 per minute")
+@limiter.limit(config.RATELIMIT_VIEW_SPECIFIC_POST)
 def view_specific_post(post_id: int):
     """View a thread by ID.
 
@@ -181,7 +165,7 @@ def view_specific_post(post_id: int):
 
 
 @app.route("/replies/new", methods=['POST'])
-@limiter.limit("20 per hour")
+@limiter.limit(config.RATELIMIT_NEW_REPLY)
 def new_reply():
     """Provide form for new thread on GET, create new thread on POST.
 
@@ -224,6 +208,7 @@ def new_reply():
         return error_response
 
 
+# TODO: ratelimit?
 @app.route('/pages/<slug>')
 def view_page(slug: str):
     page = models.db.session.query(models.Page).get(slug)
@@ -231,6 +216,7 @@ def view_page(slug: str):
 
 
 @app.route('/trip-meta/<path:tripcode>')
+@limiter.limit(config.RATELIMIT_VIEW_TRIP_META)
 def view_trip_meta(tripcode: str):
     trip_meta = models.db.session.query(models.TripMeta).get(tripcode)
     posts_by_trip = (
@@ -243,7 +229,7 @@ def view_trip_meta(tripcode: str):
 
 
 @app.route('/trip-meta/<path:tripcode>/edit', methods=['POST', 'GET'])
-@limiter.limit("45 per hour")
+@limiter.limit(config.RATELIMIT_EDIT_TRIP_META)
 def edit_trip_meta(tripcode: str):
     trip_meta_form = forms.TripMetaForm()
 
@@ -263,7 +249,7 @@ def edit_trip_meta(tripcode: str):
 
 
 @app.route('/cookie', methods=['POST', 'GET'])
-@limiter.limit("10 per hour")
+@limiter.limit(config.RATELIMIT_MANAGE_COOKIE)
 def manage_cookie():
     cookie_form = forms.CookieManagementForm(data=request.cookies)
 
@@ -305,57 +291,53 @@ def error_page_form_handler(form):
     return None
 
 
-# FIXME must check if conflicting slug...
-# what if making reply but reply is a comment?!
-@app.route("/threads/new", methods=['GET', 'POST'])
-# FIXME: set back to 10
-@limiter.limit("5 per hour")
-def new_thread():
+@app.route("/threads/new", methods=['POST'])
+@limiter.limit(config.RATELIMIT_CREATE_THREAD)
+def create_thread():
+    if not validate_recaptcha():
+        return render_template('errors.html', errors=['Captcha failed!'])
+
+    form = forms.NewPostForm()
+
+    if form.validate_on_submit():
+        try:
+            post = models.Post.from_form(form)
+        except (models.RemoteAddrIsBanned, models.DuplicateMessage) as e:
+            return render_template('errors.html', errors=[e]), e.http_status
+
+        response = redirect(
+            url_for(
+                'view_specific_post',
+                post_id=post.id,
+            )
+        )
+    else:
+        error_response = error_page_form_handler(form)
+        if error_response:
+            return error_response
+
+    response = make_response(response)
+    if form.name.data:
+        response.set_cookie(
+            'name',
+            form.name.data,
+            expires=datetime.datetime.now() + datetime.timedelta(days=30),
+        )
+
+    return response
+
+
+@app.route("/threads/new", methods=['GET'])
+@limiter.limit(config.RATELIMIT_NEW_THREAD_FORM)
+def new_thread_form():
     """Provide form for new thread on GET, create new thread on POST.
 
     """
 
-    if request.method == 'GET':
-        new_thread_form = forms.NewPostForm(data=request.cookies if request.cookies.get('remember_name') else {})
-        return render_template('new-thread.html', form=new_thread_form)
-    elif request.method == 'POST':
-        if not validate_recaptcha():
-            return render_template('errors.html', errors=['Captcha failed!'])
-        reply_to = request.form.get('reply_to')
-        form = forms.NewPostForm()
-
-        # TODO: why this if above
-        if form.validate_on_submit():
-            try:
-                post = models.Post.from_form(form)
-            except (models.RemoteAddrIsBanned, models.DuplicateMessage) as e:
-                return render_template('errors.html', errors=[e]), e.http_status
-
-            # FIXME: if this is a new thread and the maximum number
-            # of threads has been reached, delete the oldest thread
-            # and its replies.
-            response = redirect(
-                url_for(
-                    'view_specific_post',
-                    post_id=post.id,
-                )
-            )
-        else:
-            # TODO: earlier in process near other errors
-            error_response = error_page_form_handler(form)
-            if error_response:
-                return error_response
-
-        # FIXME
-        response = make_response(response)
-        if form.name.data:
-            response.set_cookie(
-                'name',
-                form.name.data,
-                expires=datetime.datetime.now() + datetime.timedelta(days=30),
-            )
-
-        return response
+    new_thread_form = forms.NewPostForm(
+        data=request.cookies if request.cookies.get('remember_name') else {},
+    )
+    return render_template('new-thread.html', form=new_thread_form)
 
 
 with app.app_context():
