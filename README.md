@@ -69,3 +69,47 @@ You can still fiddle around with `bubblebbs` like you would any ol' Python code:
   1. http://localhost:8080/
 
 You can run tests with `pytest` in the project root.
+
+## Running HTTPS
+
+Using this reverse proxy setup is really nice, it takes care of:
+
+  * Running as many Docker services as you want behind this reverse-proxy,
+    so it's easy to run many different websites on one machine!
+  * Pain-free HTTPS!
+
+Start by creating the `.letsencrypt` subdirectory of this project, where
+everything will be stored.  Keep the absolute path to this directory handy.
+Replace `/home/nuc/Server/bubblebbs/` with said absolute path in the commands
+of this section.
+
+Start the reverse proxy:
+
+```
+docker run -d -p 80:80 -p 443:443 \
+    --name nginx-proxy \
+    -v /home/nuc/Server/bubblebbs/.letsencrypt/certs:/etc/nginx/certs:ro \
+    -v /home/nuc/Server/bubblebbs/.letsencrypt/vhosts:/etc/nginx/vhost.d \
+    -v /home/nuc/Server/bubblebbs/.letsencrypt/challenge_files:/usr/share/nginx/html \
+    -v /var/run/docker.sock:/tmp/docker.sock:ro \
+    --label com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy \
+    jwilder/nginx-proxy
+```
+
+Now start the reverse proxy HTTPS "companion:"
+
+```
+docker run -d \
+    -v /home/nuc/Server/bubblebbs/.letsencrypt/certs:/etc/nginx/certs:rw \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    --volumes-from nginx-proxy \
+    jrcs/letsencrypt-nginx-proxy-companion
+```
+
+Finally launch the BubbleBBS container:
+
+```
+docker run -e "VIRTUAL_HOST=bubblebbs.cafe" -e "LETSENCRYPT_HOST=bubblebbs.cafe" -e "LETSENCRYPT_EMAIL=lily.m.mayfield@gmail.com" -e "VIRTUAL_PORT=8081" --publish 8081:80 -d -v /home/nuc/Server/bubblebbs:/app --env-file .env-file --rm bubblebbs
+```
+
+Don't forget to forward ports 80 and 443 on your router or whatever!
