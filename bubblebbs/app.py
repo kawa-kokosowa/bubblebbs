@@ -70,6 +70,18 @@ def validate_recaptcha():
         return True
 
 
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    models.FlaggedIps.new(request.remote_addr, str(e))
+    return (
+        render_template(
+            'errors.html',
+            errors=[e],
+        ),
+        429,
+    )
+
+
 # NOTE: this currently isn't being used by anything!
 @app.route("/search-json", methods=['GET'])
 def search_json():
