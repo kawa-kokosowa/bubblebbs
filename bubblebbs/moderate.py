@@ -9,6 +9,7 @@ from flask import Flask, url_for, redirect, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from wtforms import form, fields, validators
 from flask.ext import admin, login
+from sqlalchemy.exc import IntegrityError
 from flask.ext.admin.contrib import sqla
 from flask.ext.admin import helpers, expose
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -225,7 +226,7 @@ class MyAdminIndexView(admin.AdminIndexView):
         return redirect(url_for('.index'))
 
 
-# TODO: config
+# TODO: rename to populate_db()
 def build_sample_db():
     """
     Populate a small db with some example entries.
@@ -233,7 +234,7 @@ def build_sample_db():
 
     # FIXME: this is a horrible way to check for database
     # considering people may not even use sqlite!!!!
-    if not os.path.isfile('bubblebbs/test.db'):
+    try:
         models.db.create_all()
         test_user = models.User(login="admin", password=generate_password_hash("admin"))
         models.db.session.add(test_user)
@@ -246,5 +247,5 @@ def build_sample_db():
             models.db.session.add(models.ConfigPair(key=key, value=value))
 
         models.db.session.commit()
-
-    return
+    except IntegrityError:
+        pass
