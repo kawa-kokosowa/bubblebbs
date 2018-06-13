@@ -127,7 +127,7 @@ class PageModelView(MyModelView):
     )
 
     def _page_body(view, context, model, name):
-        return Markup(models.Post.parse_markdown(model.slug, model.body))
+        return Markup(models.Post.parse_markdown(model.slug, model.body, allow_all=True))
     column_formatters = {
         'body': _page_body,
     }
