@@ -183,7 +183,7 @@ class Post(db.Model):
             new_tag.string = '%s (%s)' % (anchor.string, domain)
             anchor.replace_with(new_tag)
 
-        return str(soup)
+        return soup.body.renderContents()
 
     @staticmethod
     def name_tripcode_matches_original_use(name: str, tripcode: str) -> bool:
