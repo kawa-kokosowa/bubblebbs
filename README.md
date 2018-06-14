@@ -109,7 +109,7 @@ docker run -d \
 Finally launch the BubbleBBS container:
 
 ```
-docker run -e "VIRTUAL_HOST=bubblebbs.cafe" -e "LETSENCRYPT_HOST=bubblebbs.cafe" -e "LETSENCRYPT_EMAIL=lily.m.mayfield@gmail.com" -e "VIRTUAL_PORT=8081" --publish 8081:80 -d -v /home/nuc/Server/bubblebbs:/app --env-file .env-file --rm bubblebbs
+docker run -e "BUBBLEBBS_BEHIND_REVERSE_PROXY=1" -e "VIRTUAL_HOST=bubblebbs.cafe" -e "LETSENCRYPT_HOST=bubblebbs.cafe" -e "LETSENCRYPT_EMAIL=lily.m.mayfield@gmail.com" -e "VIRTUAL_PORT=8081" --publish 8081:80 -d -v /home/nuc/Server/bubblebbs:/app --env-file .env-file --rm bubblebbs
 ```
 
 Don't forget to forward ports 80 and 443 on your router or whatever!

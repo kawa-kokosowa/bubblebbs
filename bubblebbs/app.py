@@ -8,6 +8,7 @@ import requests
 from flask import (
     Flask, redirect, render_template, url_for, send_from_directory, request, send_file, jsonify, make_response
 )
+from werkzeug.contrib.fixers import ProxyFix
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_limiter import Limiter
@@ -47,6 +48,8 @@ limiter = Limiter(
     app,
     key_func=get_remote_address,
 )
+if config.BEHIND_REVERSE_PROXY:
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
 
 def config_db(key: str) -> str:

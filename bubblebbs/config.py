@@ -1,6 +1,8 @@
 import os
 
 
+BEHIND_REVERSE_PROXY = bool(os.environ.get('BBBS_BEHIND_REVERSE_PROXY', False))
+
 POSTS_PER_PAGE = 25
 TEMPLATES_AUTO_RELOAD = True
 
