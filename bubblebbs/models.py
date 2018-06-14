@@ -183,7 +183,9 @@ class Post(db.Model):
             new_tag.string = '%s (%s)' % (anchor.string, domain)
             anchor.replace_with(new_tag)
 
-        return soup.body.renderContents()
+        # Return, stripped of the erroneous fluff elements html5lib
+        # likes to nest everything into
+        return str(soup)[len('<html><head></head><body>'):-len('</body></html>')]
 
     @staticmethod
     def name_tripcode_matches_original_use(name: str, tripcode: str) -> bool:
