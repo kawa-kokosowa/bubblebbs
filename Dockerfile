@@ -12,6 +12,7 @@ RUN apk add --no-cache bash git nginx uwsgi uwsgi-python3 redis \
 RUN apk --update add --no-cache zlib-dev python3-dev \
     libxml2-dev libxslt-dev libffi-dev gcc musl-dev libgcc curl \
     alpine-sdk openssl-dev python-dev \
+    py3-pillow \
     #libxml2-dev libxslt-dev libffi-dev gcc musl-dev libgcc openssl-dev curl \
     zlib-dev freetype-dev lcms2-dev tiff-dev tk-dev tcl-dev \
     py3-psycopg2

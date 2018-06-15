@@ -26,6 +26,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 
 from . import config
+from . import postutils
 
 
 db = SQLAlchemy()
@@ -417,6 +418,7 @@ class Post(db.Model):
         # FIXME: should sanitize first?
         # Prepare info for saving to DB
         name, tripcode = cls.make_tripcode(form)
+        identicon = postutils.ensure_identicon(tripcode)
         matches_original_use = cls.name_tripcode_matches_original_use(name, tripcode)
         verified = matches_original_use
         if not verified:

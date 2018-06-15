@@ -19,6 +19,7 @@ MarkupSafe==1.0
 mdx-bleach==0.1.2
 mdx-unimoji==1.0
 more-itertools==4.1.0
+Pillow==5.1.0
 pluggy==0.6.0
 py==1.5.3
 pymojihash==0.4.0
@@ -31,3 +32,4 @@ SQLAlchemy==1.2.5
 webencodings==0.5.1
 Werkzeug==0.14.1
 WTForms==2.1
+git+https://github.com/flavono123/identicon.git

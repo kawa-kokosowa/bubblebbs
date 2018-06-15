@@ -153,6 +153,13 @@ a:hover {
   box-sizing: content-box;
 }
 
+.identicon {
+  height: 1.5rem;
+  width: 1.5rem;
+  display: inline;
+  vertical-align: top;
+}
+
 .list-thread h1 {
   font-size: 1.25rem;
   font-weight: normal;
