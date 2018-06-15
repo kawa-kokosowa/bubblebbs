@@ -418,11 +418,14 @@ class Post(db.Model):
         # FIXME: should sanitize first?
         # Prepare info for saving to DB
         name, tripcode = cls.make_tripcode(form)
-        identicon = postutils.ensure_identicon(tripcode)
-        matches_original_use = cls.name_tripcode_matches_original_use(name, tripcode)
-        verified = matches_original_use
-        if not verified:
-            FlaggedIps.new(request.remote_addr, 'unoriginal usage of name (considering tripcode)')
+        if all([name, tripcode]):
+            identicon = postutils.ensure_identicon(tripcode)
+            matches_original_use = cls.name_tripcode_matches_original_use(name, tripcode)
+            verified = matches_original_use
+            if not verified:
+                FlaggedIps.new(request.remote_addr, 'unoriginal usage of name (considering tripcode)')
+        else:
+            verified = False
 
         timestamp = datetime.datetime.utcnow()
         message = cls.mutate_message(form, timestamp)
