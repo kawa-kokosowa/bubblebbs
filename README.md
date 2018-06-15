@@ -106,6 +106,12 @@ docker run -d \
     jrcs/letsencrypt-nginx-proxy-companion
 ```
 
+Build the BubbleBBS container:
+
+```
+docker-compose build
+```
+
 Finally launch the BubbleBBS container:
 
 ```
