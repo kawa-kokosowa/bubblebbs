@@ -18,9 +18,15 @@ def ensure_identicon(tripcode: str) -> str:
 
     """
 
-    path_where_identicon_should_be = os.path.join(
+    directory_where_identicons_go = os.path.join(
         app.app.static_folder,
         'identicons',
+    )
+    if not os.path.exists(directory_where_identicons_go):
+        os.makedirs(directory_where_identicons_go)
+
+    path_where_identicon_should_be = os.path.join(
+        directory_where_identicons_go,
         tripcode + '.png',
     )
 
