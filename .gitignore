@@ -1,5 +1,4 @@
-bubblebbs/static/thumbnails
-bubblebbs/static/uploads
+bubblebbs/static/identicons
 __pycache__
 .pytest_cache/
 *.db
