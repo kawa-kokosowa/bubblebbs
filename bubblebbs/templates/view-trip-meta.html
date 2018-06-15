@@ -5,7 +5,9 @@
 
 <article class="stdpadding page">
     <header>
-        <h1>Trip Meta for <span class="tripcode">{{ trip_meta.tripcode }}</span></h1>
+        <h1>Trip Meta for
+    <a href="/trip-meta/{{ trip_meta.tripcode }}" title="{{ trip_meta.tripcode }}" class="tripcode" style="background-color: {{ color_hash(trip_meta.tripcode).hex }}; color: #{{ complementary_color(color_hash(trip_meta.tripcode).hex) }}"><img src="/static/identicons/{{ trip_meta.tripcode }}.png" alt="identicon" class="identicon">{{ trip_meta.tripcode }}<span class="tripcode-emoji">{{ hash_to_emoji(trip_meta.tripcode, no_flags=True) }}</span></a>
+</h1>
         <p>{{ trip_meta.post_count }} posts | <a href="/trip-meta/{{ trip_meta.tripcode }}/edit">Edit info</a></p>
     </header>
     {{ trip_meta.bio | safe }}
