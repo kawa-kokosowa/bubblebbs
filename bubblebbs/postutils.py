@@ -3,7 +3,79 @@ import copy
 from urllib.parse import urlparse
 
 import Identicon
+import bleach
 from bs4 import BeautifulSoup
+import markdown
+from mdx_bleach.extension import BleachExtension
+from mdx_unimoji import UnimojiExtension
+from markdown.extensions.footnotes import FootnoteExtension
+from markdown.extensions.smarty import SmartyExtension
+from markdown.extensions.wikilinks import WikiLinkExtension
+
+
+def parse_markdown(timestamp: str, message: str, allow_all=False) -> str:
+    slug_timestamp = str(timestamp).replace(' ', '').replace(':', '').replace('.', '')
+    FootnoteExtension.get_separator = lambda x: slug_timestamp + '-'
+    extensions = [
+        SmartyExtension(
+            smart_dashes=True,
+            smart_quotes=True,
+            smart_ellipses=True,
+            substitutions={},
+        ),
+        UnimojiExtension(),  # FIXME: add in configurable emojis, etc.
+        'markdown.extensions.nl2br',
+        'markdown.extensions.footnotes',
+        'markdown.extensions.toc',
+        'markdown.extensions.def_list',
+        'markdown.extensions.abbr',
+        'markdown.extensions.fenced_code',
+    ]
+    # FIXME: review, pentest
+    if not allow_all:
+        bleach = BleachExtension(
+            strip=True,
+            tags=[
+                'h2',
+                'h3',
+                'h4',
+                'h5',
+                'h6',
+                'blockquote',
+                'ul',
+                'ol',
+                'dl',
+                'dt',
+                'dd',
+                'li',
+                'code',
+                'sup',
+                'pre',
+                'br',
+                'a',
+                'p',
+                'em',
+                'strong',
+            ],
+            attributes={
+                '*': [],
+                'h2': ['id'],
+                'h3': ['id'],
+                'h4': ['id'],
+                'h5': ['id'],
+                'h6': ['id'],
+                'li': ['id'],
+                'sup': ['id'],
+                'a': ['href'],  # FIXME: can people be deceptive with this?
+            },
+            styles={},
+            protocols=['http', 'https'],
+        )
+        extensions.append(bleach)
+
+
+    md = markdown.Markdown(extensions=extensions)
+    return md.convert(message)
 
 
 def add_domains_to_link_texts(html_message: str) -> str:
