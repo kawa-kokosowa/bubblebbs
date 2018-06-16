@@ -1,9 +1,115 @@
+"""Post-parsing utilities which do not interact with the database."""
+
+import re
 import os
 import copy
+import datetime
 from urllib.parse import urlparse
 
 import Identicon
+import bleach
 from bs4 import BeautifulSoup
+import markdown
+from mdx_bleach.extension import BleachExtension
+from mdx_unimoji import UnimojiExtension
+from markdown.extensions.footnotes import FootnoteExtension
+from markdown.extensions.smarty import SmartyExtension
+from markdown.extensions.wikilinks import WikiLinkExtension
+
+
+def youtube_link_to_embed(markdown_message):
+    replacement = r'<iframe allow="autoplay; encrypted-media" allowfullscreen frameborder="0" height="270" src="https://www.youtube.com/embed/\1" width="480"></iframe>'
+    regex = r"(?:https:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)"
+    return re.sub(regex, replacement, markdown_message)
+
+
+def parse_markdown(message: str, allow_all=True, unique_slug=None) -> str:
+    """Parse a markdown document to HTML with python-markdown.
+
+    Configures/uses various python-markdown extensions.
+
+    Arguments:
+        message: The markdown message to parse into html.
+        allow_all: Don't use bleach, don't sanitize.
+        unique_slug: When specified overrides the timestamp slug
+            which is prepended to all HTML element id attribute values.
+
+    Returns:
+        The HTML resulted from parsing the markdown with
+        python-markdown + various extensions for it.
+
+    """
+
+    # Generate a url-friendly timestamp to avoid creating
+    # the same id twice across two or more posts.
+    # FIXME: Implement for TOC
+    if unique_slug is None:
+        timestamp = datetime.datetime.utcnow()
+        # FIXME: surely there's a better way to url-ify this...
+        unique_slug = str(timestamp).replace(' ', '').replace(':', '').replace('.', '')
+    FootnoteExtension.get_separator = lambda x: unique_slug + '-'
+
+    # Configure the rest of the extensions!
+    extensions = [
+        SmartyExtension(
+            smart_dashes=True,
+            smart_quotes=True,
+            smart_ellipses=True,
+            substitutions={},
+        ),
+        UnimojiExtension(),  # FIXME: add in configurable emojis, etc.
+        'markdown.extensions.nl2br',
+        'markdown.extensions.footnotes',
+        'markdown.extensions.toc',
+        'markdown.extensions.def_list',
+        'markdown.extensions.abbr',
+        'markdown.extensions.fenced_code',
+    ]
+    if not allow_all:
+        bleach = BleachExtension(
+            strip=True,
+            tags=[
+                'h2',
+                'h3',
+                'h4',
+                'h5',
+                'h6',
+                'blockquote',
+                'ul',
+                'ol',
+                'dl',
+                'dt',
+                'dd',
+                'li',
+                'code',
+                'sup',
+                'pre',
+                'br',
+                'a',
+                'p',
+                'em',
+                'strong',
+		'iframe',
+            ],
+            attributes={
+                '*': [],
+                'h2': ['id'],
+                'h3': ['id'],
+                'h4': ['id'],
+                'h5': ['id'],
+                'h6': ['id'],
+                'li': ['id'],
+                'sup': ['id'],
+                'a': ['href'],
+		'iframe': ['allow', 'width', 'height', 'src', 'frameborder', 'allowfullscreen'],
+            },
+            styles={},
+            protocols=['http', 'https'],
+        )
+        extensions.append(bleach)
+
+    md = markdown.Markdown(extensions=extensions)
+    return md.convert(message)
 
 
 def add_domains_to_link_texts(html_message: str) -> str:

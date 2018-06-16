@@ -9,18 +9,12 @@ import datetime
 from typing import Tuple, Union
 
 import scrypt
-import markdown
-from mdx_bleach.extension import BleachExtension
-from mdx_unimoji import UnimojiExtension
-from markdown.extensions.footnotes import FootnoteExtension
 import bleach
-from markdown.extensions.smarty import SmartyExtension
-from markdown.extensions.wikilinks import WikiLinkExtension
 from flask import request
 from sqlalchemy.exc import (InvalidRequestError, IntegrityError)
 from jinja2 import Markup
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename  # TODO: use for identicon
 
 from . import config
 from . import postutils
@@ -211,72 +205,6 @@ class Post(db.Model):
 
         return message_with_links
 
-    # FIXME: dangerous because untested for vulns
-    @staticmethod
-    def parse_markdown(timestamp: str, message: str, allow_all=False) -> str:
-        slug_timestamp = str(timestamp).replace(' ', '').replace(':', '').replace('.', '')
-        FootnoteExtension.get_separator = lambda x: slug_timestamp + '-'
-        extensions = [
-            SmartyExtension(
-                smart_dashes=True,
-                smart_quotes=True,
-                smart_ellipses=True,
-                substitutions={},
-            ),
-            UnimojiExtension(),  # FIXME: add in configurable emojis, etc.
-            'markdown.extensions.nl2br',
-            'markdown.extensions.footnotes',
-            'markdown.extensions.toc',
-            'markdown.extensions.def_list',
-            'markdown.extensions.abbr',
-            'markdown.extensions.fenced_code',
-        ]
-        # FIXME: review, pentest
-        if not allow_all:
-            bleach = BleachExtension(
-                strip=True,
-                tags=[
-                    'h2',
-                    'h3',
-                    'h4',
-                    'h5',
-                    'h6',
-                    'blockquote',
-                    'ul',
-                    'ol',
-                    'dl',
-                    'dt',
-                    'dd',
-                    'li',
-                    'code',
-                    'sup',
-                    'pre',
-                    'br',
-                    'a',
-                    'p',
-                    'em',
-                    'strong',
-                ],
-                attributes={
-                    '*': [],
-                    'h2': ['id'],
-                    'h3': ['id'],
-                    'h4': ['id'],
-                    'h5': ['id'],
-                    'h6': ['id'],
-                    'li': ['id'],
-                    'sup': ['id'],
-                    'a': ['href'],  # FIXME: can people be deceptive with this?
-                },
-                styles={},
-                protocols=['http', 'https'],
-            )
-            extensions.append(bleach)
-
-
-        md = markdown.Markdown(extensions=extensions)
-        return md.convert(message)
-
     # FIXME: what if passed a name which contains no tripcode?
     @staticmethod
     def make_tripcode(form) -> Tuple[str, str]:
@@ -353,7 +281,7 @@ class Post(db.Model):
                 db.session.commit()
 
     @classmethod
-    def mutate_message(cls, form, timestamp):
+    def mutate_message(cls, form):
         """Change the message in various ways before saving to DB."""
 
         message = form.message.data
@@ -364,7 +292,8 @@ class Post(db.Model):
             styles=[],
             strip=True,
         )
-        message = cls.parse_markdown(timestamp, message)
+        message = postutils.youtube_link_to_embed(message)
+        message = postutils.parse_markdown(message)
         message = cls.reference_links(message, int(form.reply_to.data) if form.reply_to.data else None)
         message = postutils.add_domains_to_link_texts(message)
         message = cls.word_filter(message)
@@ -403,7 +332,7 @@ class Post(db.Model):
             verified = False
 
         timestamp = datetime.datetime.utcnow()
-        message = cls.mutate_message(form, timestamp)
+        message = cls.mutate_message(form)
 
         # Save!
         new_post = cls(
@@ -445,7 +374,7 @@ class Page(db.Model):
 
     @classmethod
     def from_form(cls, form):
-        body = Post.parse_markdown('lol', form.source.data)
+        body = postutils.parse_markdown('lol', form.source.data)
         return cls(body=body, slug=form.slug.data, source=form.body.data)
 
 
