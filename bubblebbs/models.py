@@ -274,10 +274,7 @@ class Post(db.Model):
             extensions.append(bleach)
 
 
-        md = markdown.Markdown(
-            extensions=[
-            ],
-        )
+        md = markdown.Markdown(extensions=extensions)
         return md.convert(message)
 
     # FIXME: what if passed a name which contains no tripcode?

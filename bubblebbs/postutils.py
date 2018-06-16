@@ -6,7 +6,6 @@ import Identicon
 from bs4 import BeautifulSoup
 
 
-# TODO: remove subdomain
 def add_domains_to_link_texts(html_message: str) -> str:
     """Append domain in parenthese to all link texts.
 
@@ -33,7 +32,7 @@ def add_domains_to_link_texts(html_message: str) -> str:
     # find every link in the message which isn't a "reflink"
     # and append `(thedomain)` to the end of each's text
     for anchor in soup.find_all('a'):
-        if anchor.has_attr('class') and ('reflink' in anchor['class']):
+        if (not anchor.has_attr('href')) or ('reflink' in anchor.attrs.get('class', [])):
             continue
 
         # Copy the tag, change its properties, and replace the original
