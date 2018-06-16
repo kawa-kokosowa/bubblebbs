@@ -1,19 +1,15 @@
 # FIXME: primary key being avoided because you have to do
 # some annoying copypaste code to get primary keys to show
 import os
-import copy
 import re
 import base64
 import zlib
 import pathlib
 import datetime
 from typing import Tuple, Union
-from urllib.parse import urlparse
-import urllib.parse
 
 import scrypt
 import markdown
-from bs4 import BeautifulSoup
 from mdx_bleach.extension import BleachExtension
 from mdx_unimoji import UnimojiExtension
 from markdown.extensions.footnotes import FootnoteExtension
@@ -161,32 +157,6 @@ class Post(db.Model):
     @staticmethod
     def extract_hashtags(message: str):
         pass
-
-    @staticmethod
-    def add_domains_to_link_texts(html_message: str):
-        soup = BeautifulSoup(html_message, 'html5lib')
-        for anchor in soup.find_all('a'):
-            if anchor.has_attr('class') and ('reflink' in anchor['class']):
-                continue
-
-            new_tag = copy.copy(anchor)
-            href_parts = urlparse(anchor['href'])
-
-            if href_parts.netloc:
-                link_type = 'external-link'
-                domain = href_parts.netloc
-            else:
-                link_type = 'internal-link'
-                domain = 'internal link'
-
-            new_tag['class'] = new_tag.get('class', []) + [link_type]
-            domain = href_parts.netloc if href_parts.netloc else 'internal link'
-            new_tag.string = '%s (%s)' % (anchor.string, domain)
-            anchor.replace_with(new_tag)
-
-        # Return, stripped of the erroneous fluff elements html5lib
-        # likes to nest everything into
-        return str(soup)[len('<html><head></head><body>'):-len('</body></html>')]
 
     @staticmethod
     def name_tripcode_matches_original_use(name: str, tripcode: str) -> bool:
@@ -391,7 +361,7 @@ class Post(db.Model):
         message = form.message.data
         message = cls.parse_markdown(timestamp, message)
         message = cls.reference_links(message, int(form.reply_to.data) if form.reply_to.data else None)
-        message = cls.add_domains_to_link_texts(message)
+        message = postutils.add_domains_to_link_texts(message)
         message = cls.word_filter(message)
         return message
 
