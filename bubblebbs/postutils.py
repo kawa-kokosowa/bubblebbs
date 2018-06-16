@@ -16,7 +16,7 @@ from markdown.extensions.smarty import SmartyExtension
 from markdown.extensions.wikilinks import WikiLinkExtension
 
 
-def parse_markdown(message: str, allow_all=False) -> str:
+def parse_markdown(message: str, allow_all=False, unique_slug=None) -> str:
     """Parse a markdown document to HTML with python-markdown.
 
     Configures/uses various python-markdown extensions.
@@ -24,6 +24,8 @@ def parse_markdown(message: str, allow_all=False) -> str:
     Arguments:
         message: The markdown message to parse into html.
         allow_all: Don't use bleach, don't sanitize.
+        unique_slug: When specified overrides the timestamp slug
+            which is prepended to all HTML element id attribute values.
 
     Returns:
         The HTML resulted from parsing the markdown with
@@ -34,9 +36,11 @@ def parse_markdown(message: str, allow_all=False) -> str:
     # Generate a url-friendly timestamp to avoid creating
     # the same id twice across two or more posts.
     # FIXME: Implement for TOC
-    timestamp = datetime.datetime.utcnow()
-    slug_timestamp = str(timestamp).replace(' ', '').replace(':', '').replace('.', '')
-    FootnoteExtension.get_separator = lambda x: slug_timestamp + '-'
+    if unique_slug is None:
+        timestamp = datetime.datetime.utcnow()
+        # FIXME: surely there's a better way to url-ify this...
+        unique_slug = str(timestamp).replace(' ', '').replace(':', '').replace('.', '')
+    FootnoteExtension.get_separator = lambda x: unique_slug + '-'
 
     # Configure the rest of the extensions!
     extensions = [
