@@ -13,6 +13,7 @@ import markdown
 from mdx_bleach.extension import BleachExtension
 from mdx_unimoji import UnimojiExtension
 from markdown.extensions.footnotes import FootnoteExtension
+import bleach
 from markdown.extensions.smarty import SmartyExtension
 from markdown.extensions.wikilinks import WikiLinkExtension
 from flask import request
@@ -359,6 +360,13 @@ class Post(db.Model):
         """Change the message in various ways before saving to DB."""
 
         message = form.message.data
+        message = bleach.clean(
+            message,
+            tags=[],
+            attributes={},
+            styles=[],
+            strip=True,
+        )
         message = cls.parse_markdown(timestamp, message)
         message = cls.reference_links(message, int(form.reply_to.data) if form.reply_to.data else None)
         message = postutils.add_domains_to_link_texts(message)
