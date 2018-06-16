@@ -292,6 +292,7 @@ class Post(db.Model):
             styles=[],
             strip=True,
         )
+        message = postutils.youtube_link_to_embed(message)
         message = postutils.parse_markdown(message)
         message = cls.reference_links(message, int(form.reply_to.data) if form.reply_to.data else None)
         message = postutils.add_domains_to_link_texts(message)

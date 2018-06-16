@@ -1,5 +1,6 @@
 """Post-parsing utilities which do not interact with the database."""
 
+import re
 import os
 import copy
 import datetime
@@ -16,7 +17,13 @@ from markdown.extensions.smarty import SmartyExtension
 from markdown.extensions.wikilinks import WikiLinkExtension
 
 
-def parse_markdown(message: str, allow_all=False, unique_slug=None) -> str:
+def youtube_link_to_embed(markdown_message):
+    replacement = r'<iframe allow="autoplay; encrypted-media" allowfullscreen frameborder="0" height="270" src="https://www.youtube.com/embed/\1" width="480"></iframe>'
+    regex = r"(?:https:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)"
+    return re.sub(regex, replacement, markdown_message)
+
+
+def parse_markdown(message: str, allow_all=True, unique_slug=None) -> str:
     """Parse a markdown document to HTML with python-markdown.
 
     Configures/uses various python-markdown extensions.
@@ -82,6 +89,7 @@ def parse_markdown(message: str, allow_all=False, unique_slug=None) -> str:
                 'p',
                 'em',
                 'strong',
+		'iframe',
             ],
             attributes={
                 '*': [],
@@ -93,6 +101,7 @@ def parse_markdown(message: str, allow_all=False, unique_slug=None) -> str:
                 'li': ['id'],
                 'sup': ['id'],
                 'a': ['href'],
+		'iframe': ['allow', 'width', 'height', 'src', 'frameborder', 'allowfullscreen'],
             },
             styles={},
             protocols=['http', 'https'],
