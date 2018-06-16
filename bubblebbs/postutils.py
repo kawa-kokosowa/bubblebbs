@@ -17,7 +17,9 @@ from markdown.extensions.wikilinks import WikiLinkExtension
 
 
 def parse_markdown(message: str, allow_all=False) -> str:
-    """Parse a markdown document to HTML.
+    """Parse a markdown document to HTML with python-markdown.
+
+    Configures/uses various python-markdown extensions.
 
     Arguments:
         message: The markdown message to parse into html.
@@ -29,9 +31,14 @@ def parse_markdown(message: str, allow_all=False) -> str:
 
     """
 
+    # Generate a url-friendly timestamp to avoid creating
+    # the same id twice across two or more posts.
+    # FIXME: Implement for TOC
     timestamp = datetime.datetime.utcnow()
     slug_timestamp = str(timestamp).replace(' ', '').replace(':', '').replace('.', '')
     FootnoteExtension.get_separator = lambda x: slug_timestamp + '-'
+
+    # Configure the rest of the extensions!
     extensions = [
         SmartyExtension(
             smart_dashes=True,
@@ -47,7 +54,6 @@ def parse_markdown(message: str, allow_all=False) -> str:
         'markdown.extensions.abbr',
         'markdown.extensions.fenced_code',
     ]
-    # FIXME: review, pentest
     if not allow_all:
         bleach = BleachExtension(
             strip=True,
@@ -82,7 +88,7 @@ def parse_markdown(message: str, allow_all=False) -> str:
                 'h6': ['id'],
                 'li': ['id'],
                 'sup': ['id'],
-                'a': ['href'],  # FIXME: can people be deceptive with this?
+                'a': ['href'],
             },
             styles={},
             protocols=['http', 'https'],
