@@ -17,7 +17,17 @@ from markdown.extensions.wikilinks import WikiLinkExtension
 
 
 def parse_markdown(message: str, allow_all=False) -> str:
-    """Parse a markdown document..."""
+    """Parse a markdown document to HTML.
+
+    Arguments:
+        message: The markdown message to parse into html.
+        allow_all: Don't use bleach, don't sanitize.
+
+    Returns:
+        The HTML resulted from parsing the markdown with
+        python-markdown + various extensions for it.
+
+    """
 
     timestamp = datetime.datetime.utcnow()
     slug_timestamp = str(timestamp).replace(' ', '').replace(':', '').replace('.', '')
@@ -78,7 +88,6 @@ def parse_markdown(message: str, allow_all=False) -> str:
             protocols=['http', 'https'],
         )
         extensions.append(bleach)
-
 
     md = markdown.Markdown(extensions=extensions)
     return md.convert(message)
