@@ -6,3 +6,4 @@ bubblebbs/*.db
 .env-file
 dump.rdb
 .letsencrypt
+*.pyc
