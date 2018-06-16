@@ -1,5 +1,8 @@
+"""Post-parsing utilities which do not interact with the database."""
+
 import os
 import copy
+import datetime
 from urllib.parse import urlparse
 
 import Identicon
@@ -13,7 +16,10 @@ from markdown.extensions.smarty import SmartyExtension
 from markdown.extensions.wikilinks import WikiLinkExtension
 
 
-def parse_markdown(timestamp: str, message: str, allow_all=False) -> str:
+def parse_markdown(message: str, allow_all=False) -> str:
+    """Parse a markdown document..."""
+
+    timestamp = datetime.datetime.utcnow()
     slug_timestamp = str(timestamp).replace(' ', '').replace(':', '').replace('.', '')
     FootnoteExtension.get_separator = lambda x: slug_timestamp + '-'
     extensions = [

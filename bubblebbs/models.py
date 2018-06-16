@@ -281,7 +281,7 @@ class Post(db.Model):
                 db.session.commit()
 
     @classmethod
-    def mutate_message(cls, form, timestamp):
+    def mutate_message(cls, form):
         """Change the message in various ways before saving to DB."""
 
         message = form.message.data
@@ -292,7 +292,7 @@ class Post(db.Model):
             styles=[],
             strip=True,
         )
-        message = postutils.parse_markdown(timestamp, message)
+        message = postutils.parse_markdown(message)
         message = cls.reference_links(message, int(form.reply_to.data) if form.reply_to.data else None)
         message = postutils.add_domains_to_link_texts(message)
         message = cls.word_filter(message)
@@ -331,7 +331,7 @@ class Post(db.Model):
             verified = False
 
         timestamp = datetime.datetime.utcnow()
-        message = cls.mutate_message(form, timestamp)
+        message = cls.mutate_message(form)
 
         # Save!
         new_post = cls(
