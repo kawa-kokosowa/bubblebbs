@@ -58,6 +58,7 @@ def parse_markdown(message: str, allow_all=True, unique_slug=None) -> str:
             substitutions={},
         ),
         UnimojiExtension(),  # FIXME: add in configurable emojis, etc.
+        'mdx_linkify',
         'markdown.extensions.nl2br',
         'markdown.extensions.footnotes',
         'markdown.extensions.toc',
