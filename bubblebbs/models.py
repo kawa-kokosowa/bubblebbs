@@ -285,8 +285,8 @@ class Post(db.Model):
         """Change the message in various ways before saving to DB."""
 
         message = form.message.data
-        message = postutils.parse_markdown(message)
         message = postutils.youtube_link_to_embed(message)
+        message = postutils.parse_markdown(message)
         message = cls.reference_links(message, int(form.reply_to.data) if form.reply_to.data else None)
         message = postutils.add_domains_to_link_texts(message)
         message = cls.word_filter(message)
