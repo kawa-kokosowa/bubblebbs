@@ -18,9 +18,15 @@ from markdown.extensions.wikilinks import WikiLinkExtension
 
 
 def youtube_link_to_embed(markdown_message):
+    """
+
+    Only replaces one link tops.
+
+    """
+
     replacement = r'<iframe allow="autoplay; encrypted-media" allowfullscreen frameborder="0" height="270" src="https://www.youtube.com/embed/\1" width="480"></iframe>'
     regex = r"(?:https:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)"
-    return re.sub(regex, replacement, markdown_message)
+    return re.sub(regex, replacement, markdown_message, 1)
 
 
 def parse_markdown(message: str, allow_all=False, unique_slug=None) -> str:
