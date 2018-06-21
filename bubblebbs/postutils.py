@@ -23,7 +23,7 @@ def youtube_link_to_embed(markdown_message):
     return re.sub(regex, replacement, markdown_message)
 
 
-def parse_markdown(message: str, allow_all=True, unique_slug=None) -> str:
+def parse_markdown(message: str, allow_all=False, unique_slug=None) -> str:
     """Parse a markdown document to HTML with python-markdown.
 
     Configures/uses various python-markdown extensions.
