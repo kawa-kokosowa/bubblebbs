@@ -6,11 +6,8 @@ python:
 services:
   - docker
 
-before_install:
-  - touch .env-file
-
 install:
-  - docker-compose build
+  - docker build . -t bubblebbs
 
 script:
-  - docker-compose run bubblebbs pytest
+  - docker run bubblebbs pytest -v "$(pwd):/app"

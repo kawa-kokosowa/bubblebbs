@@ -21,6 +21,7 @@ ENV LIBRARY_PATH=/lib:/usr/lib
 ENV APP_DIR=/app
 
 # app dir
+COPY . ${APP_DIR}
 COPY requirements.txt ${APP_DIR}/requirements.txt
 RUN pip3 install -r ${APP_DIR}/requirements.txt
 RUN chown -R nginx:nginx ${APP_DIR} \
@@ -34,9 +35,9 @@ WORKDIR ${APP_DIR}
 EXPOSE 80
 
 # copy config files into filesystem
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY app.ini /app.ini
-COPY entrypoint.sh /entrypoint.sh
+COPY docker_includes/nginx.conf /etc/nginx/nginx.conf
+COPY docker_includes/app.ini /app.ini
+COPY docker_includes/entrypoint.sh /entrypoint.sh
 
 # exectute start up script
 ENTRYPOINT ["/entrypoint.sh"]
