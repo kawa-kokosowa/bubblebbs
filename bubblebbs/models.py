@@ -142,17 +142,6 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     bumptime = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
 
-    # FIXME: rename to_dict() and use summary output not full output
-    def __iter__(self):
-        """Turn into dict with dict(post)"""
-        for column in self.__table__.columns:
-            yield column.name, getattr(self, column.name)
-
-    # TODO, FIXME
-    @staticmethod
-    def extract_hashtags(message: str):
-        pass
-
     @staticmethod
     def name_tripcode_matches_original_use(name: str, tripcode: str) -> bool:
         """Verify that this usage of `name` has the correct
@@ -205,6 +194,7 @@ class Post(db.Model):
 
         return message_with_links
 
+    # TODO: move to postutils
     # FIXME: what if passed a name which contains no tripcode?
     @staticmethod
     def make_tripcode(form) -> Tuple[str, str]:
@@ -245,34 +235,6 @@ class Post(db.Model):
         return name, tripcode
 
     @staticmethod
-    def tip_link_stuff(tip_link: str) -> Tuple[Union[str, None], Union[str, None]]:
-        if not tip_link:
-            return None, None
-        elif (not tip_link.startswith('http://')) or (not tip_link.startswith('https://')):
-            tip_link = 'http://' + tip_link
-
-        tip_domain = urlparse(tip_link).hostname if tip_link else None
-        return tip_link, tip_domain
-
-    @staticmethod
-    def word_filter(message, flag_if_filtered=True):
-        # Finally let's do some wordfiltering. Wordfilters are useful because
-        # you can catch bad words and flag users that use them.
-        message_before_filtering = message
-
-        word_filters = db.session.query(WordFilter).all()
-        for word_filter in word_filters:
-            find = re.compile(r'\b' + re.escape(word_filter.find) + r'(ies\b|s\b|\b)', re.IGNORECASE)
-            # NOTE: I make it upper because I think it's funnier this way,
-            # plus indicative of wordfiltering happening.
-            message = find.sub(word_filter.replace.upper(), message)
-
-        if flag_if_filtered and (message_before_filtering != message):
-            FlaggedIps.new(request.remote_addr, 'word filter')
-
-        return message
-
-    @staticmethod
     def set_bump(form, reply_to, timestamp):
         if reply_to and not form.sage.data:
             original = db.session.query(Post).get(reply_to)
@@ -289,7 +251,12 @@ class Post(db.Model):
         message = postutils.parse_markdown(message)
         message = cls.reference_links(message, int(form.reply_to.data) if form.reply_to.data else None)
         message = postutils.add_domains_to_link_texts(message)
-        message = cls.word_filter(message)
+
+        # If message gets filtered flag poster's IP
+        message, was_filtered = WordFilter.replace_all(message)
+        if was_filtered:
+            FlaggedIps.new(request.remote_addr, 'word filter')
+
         return message
 
     @classmethod
@@ -446,3 +413,37 @@ class ConfigPair(db.Model):
 class WordFilter(db.Model):
     find = db.Column(db.String(100), primary_key=True)
     replace = db.Column(db.String(1000), nullable=False)  # can be html
+
+    @classmethod
+    def replace_all(cls, text_to_filter: str) -> Tuple[str, bool]:
+        """Perform find/replace for every entry in word filter table.
+
+        Another use is flagging users who have triggered the word filter.
+
+        Arguments:
+            text_to_filter: This text will have word filter performed
+                on it. The result of the find/replace operations will
+                be returned.
+
+        Returns:
+            filtered message, message was filtered (true/false): A two
+                item tuple, the first element is the message with the
+                word filter operations applied, the second is if the
+                message has changed at all from such operations.
+
+        """
+
+        text_before_filtering = text_to_filter
+
+        for word_filter in cls.get_all():
+            # FIXME: candy-ies?
+            find = re.compile(r'\b' + re.escape(word_filter.find) + r'(ies\b|s\b|\b)', re.IGNORECASE)
+            # NOTE: I make it upper because I think it's funnier this way,
+            # plus indicative of wordfiltering happening.
+            text_to_filter = find.sub(word_filter.replace.upper(), text_to_filter)
+
+        return (text_to_filter, text_before_filtering != text_to_filter)
+
+    @classmethod
+    def get_all(cls):
+        return db.session.query(cls).all()
