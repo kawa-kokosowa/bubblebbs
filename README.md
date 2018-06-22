@@ -72,10 +72,11 @@ like this:
 
 ```
 docker build . -t bubblebbs
-docker run -it bubblebbs debug \
+docker run -it \
     -p 8080:8080 \
     -v "$(pwd):/app" \
     --env-file .env-file
+    bubblebbs debug
 ```
 
 To find out the address the debug server is running on you can use this (but
@@ -148,7 +149,7 @@ Finally launch the BubbleBBS container, but please take special care to use
 your information (don't just paste this!):
 
 ```
-docker run bubblebbs \
+docker run \
     -e "BBBS_BEHIND_REVERSE_PROXY=1" \
     -e "VIRTUAL_HOST=bubblebbs.cafe" \
     -e "LETSENCRYPT_HOST=bubblebbs.cafe" \
@@ -156,9 +157,10 @@ docker run bubblebbs \
     -e "VIRTUAL_PORT=8081" \
     --publish 8081:80 \
     -d \
-    -v "$(pwd)/bubblebbs/bubblebbs.db:bubblebbs/bubblebbs.db" \
+    -v "$(pwd)/bubblebbs/bubblebbs.db:/app/bubblebbs/bubblebbs.db" \
     --env-file .env-file \
     --name bbbsd
+    bubblebbs
 ```
 
 You can relaunch with `docker up bbbsd`.  You don't need an `env-file` you can
