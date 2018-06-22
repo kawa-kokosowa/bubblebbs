@@ -157,10 +157,11 @@ docker run bubblebbs \
     --publish 8081:80 \
     -d \
     -v "$(pwd)/bubblebbs/bubblebbs.db:bubblebbs/bubblebbs.db"
-    --env-file .env-file
+    --env-file .env-file \
+    --name bbbsd
 ```
 
-You don't need an `env-file` you can just use `-e` for all the
-envvars instead (especially useful if you're using AWS ECS!).
-Also if you're not using sqlite3 you can remove `-v
+You can relaunch with `docker up bbbsd`.  You don't need an `env-file` you can
+just use `-e` for all the envvars instead (especially useful if you're using
+AWS ECS!).  Also if you're not using sqlite3 you can remove `-v
 "$(pwd)/bubblebbs/bubblebbs.db:bubblebbs/bubblebbs.db"`.
