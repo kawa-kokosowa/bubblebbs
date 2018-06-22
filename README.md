@@ -67,23 +67,15 @@ You only need to run `docker build` once, but you need to run it again when/if
 ### Debugging
 
 To make a debugging server which reloads on changes run on
-http://<docker-ip>:8080 (generally it's http://172.17.0.2:8080/) do something
-like this:
+http://localhost:8080/ do something like this:
 
 ```
 docker build . -t bubblebbs
 docker run -it \
     -p 8080:8080 \
     -v "$(pwd):/app" \
-    --env-file .env-file
+    --env-file .env-file \
     bubblebbs debug
-```
-
-To find out the address the debug server is running on you can use this (but
-replace `containerid` with the id of the container created in last step):
-
-```
-docker inspect -f "{{ .NetworkSettings.IPAddress }}" containerid
 ```
 
 You only need to run `docker build` once, but you need to run it again when/if
@@ -159,7 +151,7 @@ docker run \
     -d \
     -v "$(pwd)/bubblebbs/bubblebbs.db:/app/bubblebbs/bubblebbs.db" \
     --env-file .env-file \
-    --name bbbsd
+    --name bbbsd \
     bubblebbs
 ```
 
