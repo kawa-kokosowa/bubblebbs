@@ -156,7 +156,7 @@ docker run bubblebbs \
     -e "VIRTUAL_PORT=8081" \
     --publish 8081:80 \
     -d \
-    -v "$(pwd)/bubblebbs/bubblebbs.db:bubblebbs/bubblebbs.db"
+    -v "$(pwd)/bubblebbs/bubblebbs.db:bubblebbs/bubblebbs.db" \
     --env-file .env-file \
     --name bbbsd
 ```
