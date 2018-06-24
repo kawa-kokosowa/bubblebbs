@@ -4,8 +4,11 @@ import re
 import os
 import copy
 import datetime
+import base64
 from urllib.parse import urlparse
+from typing import Tuple
 
+import scrypt
 import Identicon
 import bleach
 from bs4 import BeautifulSoup
@@ -15,6 +18,47 @@ from mdx_unimoji import UnimojiExtension
 from markdown.extensions.footnotes import FootnoteExtension
 from markdown.extensions.smarty import SmartyExtension
 from markdown.extensions.wikilinks import WikiLinkExtension
+
+from . import config
+
+
+# FIXME: what if passed a name which contains no tripcode?
+def make_tripcode(form_name: str) -> Tuple[str, str]:
+    """Create a tripcode from the name field of a post.
+
+    Returns:
+        tuple: A two-element tuple containing (in the order of):
+            name without tripcode, tripcode.
+
+    Warning:
+        Must have `this#format` or it will raise an exception
+        related to unpacking.
+
+    """
+
+    # A valid tripcode is a name field containing an octothorpe
+    # that isn't the last character.
+    if not (form_name and '#' in form_name[:-1]):
+        return form_name, None
+
+    name, unhashed_tripcode = form_name.split('#', 1)
+
+    # Create the salt
+    if len(name) % 2 == 0:
+        salt = name + config.SECRET_SALT
+    else:
+        salt = config.SECRET_SALT + name
+
+    tripcode = str(
+        base64.b64encode(
+            scrypt.hash(
+                name + config.SECRET_KEY + unhashed_tripcode,
+                salt,
+                buflen=16,
+            ),
+        ),
+    )[2:-1].replace('/', '.').replace('+', '_').replace('=', '-')
+    return name, tripcode
 
 
 def youtube_link_to_embed(markdown_message):
@@ -119,6 +163,11 @@ def parse_markdown(message: str, allow_all=False, unique_slug=None) -> str:
     return md.convert(message)
 
 
+def remove_html5lib_crud(soup) -> str:
+    # Preserve formatting as much as possible, but also remove the
+    # junk <html>, <body>, etc., that html5lib adds to all soups...
+    return soup.body.prettify(formatter=None)[len('<body>'):len('</body>')]
+
 def add_domains_to_link_texts(html_message: str) -> str:
     """Append domain in parenthese to all link texts.
 
@@ -159,7 +208,7 @@ def add_domains_to_link_texts(html_message: str) -> str:
 
     # Return, stripped of the erroneous fluff elements html5lib
     # likes to nest everything into
-    return str(soup)[len('<html><head></head><body>'):-len('</body></html>')]
+    return remove_html5lib_crud(soup)
 
 
 def ensure_identicon(tripcode: str) -> str:

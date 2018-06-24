@@ -3,6 +3,10 @@ from textwrap import dedent
 from bubblebbs import postutils
 
 
+def test_make_tripcode():
+    assert ('bleh', 'CWj74YsG7iMjTMMxPvhZpA--') == postutils.make_tripcode('bleh#lol')
+
+
 # FIXME: how the heck can i test this when it generates time?
 def test_parse_markdown():
     markdown_to_parse = """

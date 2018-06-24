@@ -58,7 +58,7 @@ Make sure to change this!
 
 ```
 docker build . -t bubblebbs
-docker run bubblebbs pytest -v "$(pwd):/app"
+docker run -v "$(pwd):/app" bubblebbs pytest
 ```
 
 You only need to run `docker build` once, but you need to run it again when/if

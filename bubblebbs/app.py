@@ -6,7 +6,17 @@ import datetime
 
 import requests
 from flask import (
-    Flask, redirect, render_template, url_for, send_from_directory, request, send_file, jsonify, make_response
+    Flask,
+    redirect,
+    render_template,
+    url_for,
+    send_from_directory,
+    request,
+    send_file,
+    jsonify,
+    make_response,
+    Blueprint,
+    current_app,
 )
 from werkzeug.contrib.fixers import ProxyFix
 from flask_admin import Admin
@@ -23,33 +33,64 @@ from . import moderate
 from . import templating
 
 
-app = Flask(__name__)
-app.config.from_object(config)
-# TODO: move this all to templating.py
-app.jinja_env.globals.update(
-    since_bumptime=templating.since_bumptime,
-    get_pages=templating.get_pages,
-    hash_to_emoji=hash_to_emoji,
-    color_hash=ColorHash,
-    quote=quote,
-    complementary_color=templating.complementary_color,
-    post_summary=templating.post_summary,
-    truncate=templating.truncate,
-    get_blotter_entries=templating.get_blotter_entries,
-    get_stylesheet=templating.get_stylesheet,
-    recaptcha_enabled=config.RECAPTCHA_ENABLED,
-    recaptcha_site_key=config.RECAPTCHA_SITE_KEY,
-)  # why not move this to templating?
-# TODO: may add filter in future
-app.jinja_env.filters = {
-    **app.jinja_env.filters,
-}
+blueprint = Blueprint('app', __name__)
 limiter = Limiter(
-    app,
     key_func=get_remote_address,
 )
-if config.BEHIND_REVERSE_PROXY:
-    app.wsgi_app = ProxyFix(app.wsgi_app)
+
+
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(config)
+    # TODO: move this all to templating.py
+    app.jinja_env.globals.update(
+        since_bumptime=templating.since_bumptime,
+        get_pages=templating.get_pages,
+        hash_to_emoji=hash_to_emoji,
+        color_hash=ColorHash,
+        quote=quote,
+        complementary_color=templating.complementary_color,
+        post_summary=templating.post_summary,
+        truncate=templating.truncate,
+        get_blotter_entries=templating.get_blotter_entries,
+        get_stylesheet=templating.get_stylesheet,
+        recaptcha_enabled=config.RECAPTCHA_ENABLED,
+        recaptcha_site_key=config.RECAPTCHA_SITE_KEY,
+    )  # why not move this to templating?
+    # TODO: may add filter in future
+    app.jinja_env.filters = {
+        **app.jinja_env.filters,
+    }
+    limiter.init_app(app)
+    if config.BEHIND_REVERSE_PROXY:
+        app.wsgi_app = ProxyFix(app.wsgi_app)
+
+    app.jinja_env.globals.update(config_db=config_db)
+
+    # Initialize flask-login
+    moderate.init_login(app)
+
+    # Create admin
+    admin_ = Admin(app, 'Example: Auth', index_view=moderate.MyAdminIndexView(), base_template='my_master.html')
+
+    # Add views
+    admin_.add_view(moderate.AdminUserModelView(models.User, models.db.session))
+    admin_.add_view(moderate.PostModelView(models.Post, models.db.session))
+    admin_.add_view(moderate.BanView(models.Ban, models.db.session))
+    admin_.add_view(moderate.MyModelView(models.BlotterEntry, models.db.session))
+    admin_.add_view(moderate.MyModelView(models.FlaggedIps, models.db.session))
+    admin_.add_view(moderate.PageModelView(models.Page, models.db.session))
+    admin_.add_view(moderate.ConfigView(models.ConfigPair, models.db.session))
+    admin_.add_view(moderate.WordFilterView(models.WordFilter, models.db.session))
+    admin_.add_view(moderate.BannablePhraseView(models.BannablePhrases, models.db.session))
+
+    models.db.init_app(app)
+    with app.app_context():
+        moderate.build_sample_db()
+
+    app.register_blueprint(blueprint)
+
+    return app
 
 
 def config_db(key: str) -> str:
@@ -72,7 +113,7 @@ def validate_recaptcha():
         return True
 
 
-@app.errorhandler(429)
+@blueprint.errorhandler(429)
 def ratelimit_handler(e):
     models.FlaggedIps.new(request.remote_addr, str(e))
     return (
@@ -84,7 +125,7 @@ def ratelimit_handler(e):
     )
 
 
-@app.route("/", methods=['GET'])
+@blueprint.route("/", methods=['GET'])
 @limiter.limit(config.RATELIMIT_LIST_THREADS)
 def list_threads():
     """View threads by bumptime in a list.
@@ -134,7 +175,7 @@ def list_threads():
 
 
 # FIXME: check if reply or not for error/404, else...
-@app.route("/threads/<int:post_id>")
+@blueprint.route("/threads/<int:post_id>")
 @limiter.limit(config.RATELIMIT_VIEW_SPECIFIC_POST)
 def view_specific_post(post_id: int):
     """View a thread by ID.
@@ -167,7 +208,7 @@ def view_specific_post(post_id: int):
         )
 
 
-@app.route("/replies/new", methods=['POST'])
+@blueprint.route("/replies/new", methods=['POST'])
 @limiter.limit(config.RATELIMIT_NEW_REPLY)
 def new_reply():
     """Provide form for new thread on GET, create new thread on POST.
@@ -191,7 +232,7 @@ def new_reply():
         # and its replies.
         response = redirect(
             url_for(
-                'view_specific_post',
+                'app.view_specific_post',
                 post_id=post.reply_to,
                 _anchor=post.id,
             )
@@ -212,13 +253,13 @@ def new_reply():
 
 
 # TODO: ratelimit?
-@app.route('/pages/<slug>')
+@blueprint.route('/pages/<slug>')
 def view_page(slug: str):
     page = models.db.session.query(models.Page).get(slug)
     return render_template('page.html', page=page)
 
 
-@app.route('/trip-meta/<path:tripcode>')
+@blueprint.route('/trip-meta/<path:tripcode>')
 @limiter.limit(config.RATELIMIT_VIEW_TRIP_META)
 def view_trip_meta(tripcode: str):
     trip_meta = models.db.session.query(models.TripMeta).get(tripcode)
@@ -231,7 +272,7 @@ def view_trip_meta(tripcode: str):
     return render_template('view-trip-meta.html', trip_meta=trip_meta, posts=posts_by_trip)
 
 
-@app.route('/trip-meta/<path:tripcode>/edit', methods=['POST', 'GET'])
+@blueprint.route('/trip-meta/<path:tripcode>/edit', methods=['POST', 'GET'])
 @limiter.limit(config.RATELIMIT_EDIT_TRIP_META)
 def edit_trip_meta(tripcode: str):
     trip_meta_form = forms.TripMetaForm()
@@ -246,12 +287,12 @@ def edit_trip_meta(tripcode: str):
         trip_meta.bio_source = trip_meta_form.bio.data
         trip_meta.bio = models.Post.parse_markdown('', trip_meta_form.bio.data)
         models.db.session.commit()
-        return redirect(url_for('view_trip_meta', tripcode=tripcode))
+        return redirect(url_for('app.view_trip_meta', tripcode=tripcode))
     else:
         raise Exception([models.Post.make_tripcode(trip_meta_form), tripcode])
 
 
-@app.route('/cookie', methods=['POST', 'GET'])
+@blueprint.route('/cookie', methods=['POST', 'GET'])
 @limiter.limit(config.RATELIMIT_MANAGE_COOKIE)
 def manage_cookie():
     cookie_form = forms.CookieManagementForm(data=request.cookies)
@@ -263,7 +304,7 @@ def manage_cookie():
         response = make_response(
             redirect(
                 url_for(
-                    'manage_cookie',
+                    'app.manage_cookie',
                 ),
             ),
         )
@@ -294,7 +335,7 @@ def error_page_form_handler(form):
     return None
 
 
-@app.route("/threads/new", methods=['POST'])
+@blueprint.route("/threads/new", methods=['POST'])
 @limiter.limit(config.RATELIMIT_CREATE_THREAD)
 def create_thread():
     if not validate_recaptcha():
@@ -310,7 +351,7 @@ def create_thread():
 
         response = redirect(
             url_for(
-                'view_specific_post',
+                'app.view_specific_post',
                 post_id=post.id,
             )
         )
@@ -330,7 +371,7 @@ def create_thread():
     return response
 
 
-@app.route("/threads/new", methods=['GET'])
+@blueprint.route("/threads/new", methods=['GET'])
 @limiter.limit(config.RATELIMIT_NEW_THREAD_FORM)
 def new_thread_form():
     """Provide form for new thread on GET, create new thread on POST.
@@ -341,28 +382,3 @@ def new_thread_form():
         data=request.cookies if request.cookies.get('remember_name') else {},
     )
     return render_template('new-thread.html', form=new_thread_form)
-
-
-with app.app_context():
-    # Make it so can access config db from template
-    app.jinja_env.globals.update(config_db=config_db)
-
-    # Initialize flask-login
-    moderate.init_login(app)
-
-    # Create admin
-    admin_ = Admin(app, 'Example: Auth', index_view=moderate.MyAdminIndexView(), base_template='my_master.html')
-
-    # Add views
-    admin_.add_view(moderate.AdminUserModelView(models.User, models.db.session))
-    admin_.add_view(moderate.PostModelView(models.Post, models.db.session))
-    admin_.add_view(moderate.BanView(models.Ban, models.db.session))
-    admin_.add_view(moderate.MyModelView(models.BlotterEntry, models.db.session))
-    admin_.add_view(moderate.MyModelView(models.FlaggedIps, models.db.session))
-    admin_.add_view(moderate.PageModelView(models.Page, models.db.session))
-    admin_.add_view(moderate.ConfigView(models.ConfigPair, models.db.session))
-    admin_.add_view(moderate.WordFilterView(models.WordFilter, models.db.session))
-    admin_.add_view(moderate.BannablePhraseView(models.BannablePhrases, models.db.session))
-
-    models.db.init_app(app)
-    moderate.build_sample_db()

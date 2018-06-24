@@ -10,4 +10,4 @@ install:
   - docker build . -t bubblebbs
 
 script:
-  - docker run bubblebbs pytest -v "$(pwd):/app"
+  - docker run -v "$(pwd):/app" bubblebbs pytest
