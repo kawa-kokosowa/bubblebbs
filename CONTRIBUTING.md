@@ -1,6 +1,6 @@
 # Contributing to BubbleBBS
 
-Hello this is [Lily](https://github.com/lily-mayfield) and I want to thank you for reading this file.
+Hello this is [Kawa](https://github.com/kawa-kokosowa) and I want to thank you for reading this file.
 
 ## Git
 
@@ -16,9 +16,9 @@ Please label your issues well!
 
 Here are the easiest ways to contribute right now:
 
-  * [I want your opinion on an idea or question I pose](https://github.com/lily-mayfield/bubblebbs/labels/opinions-wanted)
-  * [Good first issues](https://github.com/lily-mayfield/bubblebbs/labels/good%20first%20issue)
+  * [I want your opinion on an idea or question I pose](https://github.com/kawa-kokosowa/bubblebbs/labels/opinions-wanted)
+  * [Good first issues](https://github.com/kawa-kokosowa/bubblebbs/labels/good%20first%20issue)
 
-In terms of our goals for releases please see [BubbleBBS' milestones](https://github.com/lily-mayfield/bubblebbs/milestones?direction=asc&sort=title&state=open).
+In terms of our goals for releases please see [BubbleBBS' milestones](https://github.com/kawa-kokosowa/bubblebbs/milestones?direction=asc&sort=title&state=open).
 
-Please also check [BubbleBBS issue labels](https://github.com/lily-mayfield/bubblebbs/labels), in case you want to help with something specific.
+Please also check [BubbleBBS issue labels](https://github.com/kawa-kokosowa/bubblebbs/labels), in case you want to help with something specific.
