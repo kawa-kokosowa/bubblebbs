@@ -1,5 +1,5 @@
 FROM alpine
-MAINTAINER Lily Mayfield <lily.m.mayfield@gmail.com>
+MAINTAINER Kawa Kokosowa <kawa.kokosowa@gmail.com>
 
 # update!
 RUN apk update

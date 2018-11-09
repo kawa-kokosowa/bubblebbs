@@ -1,9 +1,10 @@
 bubblebbs/static/identicons
 __pycache__
+*.swp
 .pytest_cache/
 *.db
 bubblebbs/*.db
 .env-file
-dump.rdb
+*.rdb
 .letsencrypt
 *.pyc

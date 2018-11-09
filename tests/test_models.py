@@ -1,51 +1,53 @@
+import os
+import unittest
+
+from bubblebbs import config
+from bubblebbs import app
+from bubblebbs import moderate
 from bubblebbs import models
 
-class TestPost:
-    def test_make_tripcode(self):
-        assert ('bleh', 'ZoGgoBAnxOWv8QiHwA9A') == models.Post.make_tripcode('bleh#lol')
+
+class TestPost(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        config.SQLALCHEMY_DATABASE_URI = 'sqlite://'
+        cls.app = app.create_app()
+        cls.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+
+    def setUp(self):
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+        self.app.config['TESTING'] = True
+        self.app.config['WTF_CSRF_ENABLED'] = False
+        self.app.config['RATELIMIT_ENABLED'] = False
+        self.test_app = self.app.test_client()
+        app.limiter.enabled = False
+
+        response = self.test_app.get('/')
+        assert response.status_code == 200
+
+        response = self.test_app.post('/threads/new', data={'name': 'uboa', 'message': 'lol'})
+        assert response.status_code == 302
+
+        response = self.test_app.post(
+            '/replies/new',
+            data={'name': 'uboa', 'message': 'heckers', 'reply_to': 1},
+        )
+        assert response.status_code == 302
 
     def test_reference_links(self):
-        test_links_message = '''
-        guess what
+        """Test the insertion of @2 style post reference links."""
 
-        >>22
+        # The raw post text we hope to turn into something correctly parsed
+        with open('tests/parsing/reference_links_unparsed.txt') as f:
+            test_links_message = f.read()
 
-        ur good
+        # We feed the raw post text and hope it's correctly parsed
+        with self.app.app_context():
+            hopefully_nicely_linked = models.Post.reference_links(test_links_message, 42)
 
-        >>asdf
+        # What the post text *should* be after parsing it
+        with open('tests/parsing/reference_links_parsed.txt') as f:
+            correctly_parsed_nicely_linked = f.read()
 
-        >>3
-
-        >dlasjf;lkjsd
-
-        >3
-
-        your >> butt >> 33
-
-        afsoiu wfkj wfe >>22 ajs;lfkjasf>>22
-
-        >>33f
-        '''
-        hopefully_nicely_linked = models.Post.reference_links(test_links_message, 42)
-        correctly_parsed_nicely_linked = '''
-        guess what
-
-        <a href="/threads/42#22">&gt;&gt;22</a>
-
-        ur good
-
-        &gt;&gt;asdf
-
-        <a href="/threads/42#3">&gt;&gt;3</a>
-
-        &gt;dlasjf;lkjsd
-
-        &gt;3
-
-        your &gt;&gt; butt &gt;&gt; 33
-
-        afsoiu wfkj wfe <a href="/threads/42#22">&gt;&gt;22</a> ajs;lfkjasf<a href="/threads/42#22">&gt;&gt;22</a>
-
-        <a href="/threads/42#33">&gt;&gt;33</a>f
-        '''
         assert hopefully_nicely_linked == correctly_parsed_nicely_linked

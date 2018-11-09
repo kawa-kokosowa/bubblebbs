@@ -1,16 +1,15 @@
 # FIXME: primary key being avoided because you have to do
 # some annoying copypaste code to get primary keys to show
+import copy
 import os
 import re
-import base64
-import zlib
 import pathlib
 import datetime
 from typing import Tuple, Union
 
-import scrypt
 import bleach
 from flask import request
+from bs4 import BeautifulSoup
 from sqlalchemy.exc import (InvalidRequestError, IntegrityError)
 from jinja2 import Markup
 from flask_sqlalchemy import SQLAlchemy
@@ -157,17 +156,18 @@ class Post(db.Model):
         )
         return (not first_post_using_name) or first_post_using_name.tripcode == tripcode
 
-    # TODO: link cross-threads if needbe
+    # FIXME
     @staticmethod
     def reference_links(message, reply_to: int = None) -> str:
-        """Parse @id links"""
+        """Parse @id links.
 
-        pattern = re.compile('\@([0-9]+)')
-        message_with_links = message
-        for match in re.finditer(pattern, message):
+        Explicitly avoids generating links within links.
+
+        """
+
+        def replace(match):
             at_number = int(match.group(1))
 
-            # FIXME: what if not found?
             # Construct the link based on determining if this is
             # a reference to a thread or if it's a reference to a reply
             post_referenced = Post.query.get(at_number)
@@ -180,59 +180,19 @@ class Post(db.Model):
                 link = str(post_referenced.id)
                 valid = True
 
-            replace_pattern = re.compile('\@%d' % at_number)
-
             if valid:
-                replace_with = r'<a href="/threads/%s" class="reflink">@%d</a>' % (link, at_number)
+                return '<a href="/threads/%s" class="reflink">@%d</a>' % (link, at_number)
             else:
-                replace_with = r'<span class="reflink reflink-invalid">@%d</span>' % at_number
+                return '<span class="reflink reflink-invalid">@%d</span>' % at_number
 
-            message_with_links = replace_pattern.sub(
-                replace_with,
-                message_with_links,
-            )
+        soup = BeautifulSoup(message, 'html.parser')
+        at_link_pattern = re.compile(r'@(\d+)')
+        for text_match in soup.find_all(text=True):
+            if re.search(at_link_pattern, text_match) and text_match.parent.name != 'a':
+                new_text = re.sub(at_link_pattern, replace, text_match)
+                text_match.replace_with(new_text)
 
-        return message_with_links
-
-    # TODO: move to postutils
-    # FIXME: what if passed a name which contains no tripcode?
-    @staticmethod
-    def make_tripcode(form) -> Tuple[str, str]:
-        """Create a tripcode from the name field of a post.
-
-        Returns:
-            tuple: A two-element tuple containing (in the order of):
-                name without tripcode, tripcode.
-
-        Warning:
-            Must have `this#format` or it will raise an exception
-            related to unpacking.
-
-        """
-
-        # A valid tripcode is a name field containing an octothorpe
-        # that isn't the last character.
-        if not (form.name.data and '#' in form.name.data[:-1]):
-            return form.name.data, None
-
-        name, unhashed_tripcode = form.name.data.split('#', 1)
-
-        # Create the salt
-        if len(name) % 2 == 0:
-            salt = name + config.SECRET_SALT
-        else:
-            salt = config.SECRET_SALT + name
-
-        tripcode = str(
-            base64.b64encode(
-                scrypt.hash(
-                    name + config.SECRET_KEY + unhashed_tripcode,
-                    salt,
-                    buflen=16,
-                ),
-            ),
-        )[2:-1].replace('/', '.').replace('+', '_').replace('=', '-')
-        return name, tripcode
+        return soup.prettify(formatter=None)
 
     @staticmethod
     def set_bump(form, reply_to, timestamp):
@@ -281,7 +241,7 @@ class Post(db.Model):
 
         # FIXME: should sanitize first?
         # Prepare info for saving to DB
-        name, tripcode = cls.make_tripcode(form)
+        name, tripcode = postutils.make_tripcode(form.name.data)
         if all([name, tripcode]):
             identicon = postutils.ensure_identicon(tripcode)
             matches_original_use = cls.name_tripcode_matches_original_use(name, tripcode)

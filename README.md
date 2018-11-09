@@ -1,7 +1,7 @@
 # BubbleBBS
 
 [![Build
-Status](https://travis-ci.org/lily-mayfield/bubblebbs.svg?branch=master)](https://travis-ci.org/lily-mayfield/bubblebbs)
+Status](https://travis-ci.org/kawa-kokosowa/bubblebbs.svg?branch=master)](https://travis-ci.org/kawa-kokosowa/bubblebbs)
 
 Text BBS/message board which runs [bubblebbs.cafe](http://bubblebbs.cafe).
 
@@ -58,7 +58,7 @@ Make sure to change this!
 
 ```
 docker build . -t bubblebbs
-docker run bubblebbs pytest -v "$(pwd):/app"
+docker run -v "$(pwd):/app" bubblebbs pytest
 ```
 
 You only need to run `docker build` once, but you need to run it again when/if
@@ -145,7 +145,7 @@ docker run \
     -e "BBBS_BEHIND_REVERSE_PROXY=1" \
     -e "VIRTUAL_HOST=bubblebbs.cafe" \
     -e "LETSENCRYPT_HOST=bubblebbs.cafe" \
-    -e "LETSENCRYPT_EMAIL=lily.m.mayfield@gmail.com" \
+    -e "LETSENCRYPT_EMAIL=kawa.kokosowa@gmail.com" \
     -e "VIRTUAL_PORT=8081" \
     --publish 8081:80 \
     -d \

@@ -1,0 +1,51 @@
+[TOC]
+
+## Example Markdown Post
+
+This is an example Markdown post. This is a normal paragraph. Oh look, this paragraph [has a link!](http://example.org)
+
+*This is a bold paragraph.*
+
+_This paragraph is italic._
+
+To use codeblocks just use three of these to open and close: `
+
+### H3
+
+Here's some more text and oh look a citation.[^1]
+
+#### H4
+
+If you do ... it gets turned into a proper ellipsis.
+
+The HTML specification
+is maintained by the W3C. This paragraph shows off abbreviations.
+
+*[HTML]: Hyper Text Markup Language
+*[W3C]:  World Wide Web Consortium
+
+##### H5
+
+If use you use " they get turned into left and right quotes.
+
+Here are some definition lists...
+
+Apple
+:   Pomaceous fruit of plants of the genus Malus in
+    the family Rosaceae.
+
+Orange
+:   The fruit of an evergreen tree of the genus Citrus.
+
+###### H6
+
+If you use apostrophes ' they get turned into the proper-facing version.
+
+This is
+a single paragraph
+because of nl2br
+
+### Citations
+
+[^1]: A rad person
+
