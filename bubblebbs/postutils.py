@@ -151,7 +151,7 @@ def parse_markdown(message: str, allow_all=False, unique_slug=None) -> str:
                 'h6': ['id'],
                 'li': ['id'],
                 'sup': ['id'],
-                'a': ['href'],
+                'a': ['href', 'class'],
 		'iframe': ['allow', 'width', 'height', 'src', 'frameborder', 'allowfullscreen'],
             },
             styles={},
@@ -162,11 +162,6 @@ def parse_markdown(message: str, allow_all=False, unique_slug=None) -> str:
     md = markdown.Markdown(extensions=extensions)
     return md.convert(message)
 
-
-def remove_html5lib_crud(soup) -> str:
-    # Preserve formatting as much as possible, but also remove the
-    # junk <html>, <body>, etc., that html5lib adds to all soups...
-    return soup.body.prettify(formatter=None)[len('<body>'):len('</body>')]
 
 def add_domains_to_link_texts(html_message: str) -> str:
     """Append domain in parenthese to all link texts.
@@ -189,7 +184,7 @@ def add_domains_to_link_texts(html_message: str) -> str:
 
     """
 
-    soup = BeautifulSoup(html_message, 'html5lib')
+    soup = BeautifulSoup(html_message, 'html.parser')
 
     # find every link in the message which isn't a "reflink"
     # and append `(thedomain)` to the end of each's text
@@ -206,9 +201,7 @@ def add_domains_to_link_texts(html_message: str) -> str:
         new_tag.string = '%s (%s)' % (anchor.string, domain)
         anchor.replace_with(new_tag)
 
-    # Return, stripped of the erroneous fluff elements html5lib
-    # likes to nest everything into
-    return remove_html5lib_crud(soup)
+    return soup.prettify(formatter=None)
 
 
 def ensure_identicon(tripcode: str) -> str:

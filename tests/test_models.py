@@ -35,53 +35,19 @@ class TestPost(unittest.TestCase):
         )
         assert response.status_code == 302
 
-    def tearDown(self):
-        os.close(self.db_fd)
-        os.unlink(self.app.config['SQLALCHEMY_DATABASE_URI'])
-
-    # FIXME: needs test demo posts...
     def test_reference_links(self):
-        test_links_message = '''
-        guess what
+        """Test the insertion of @2 style post reference links."""
 
-        @2
+        # The raw post text we hope to turn into something correctly parsed
+        with open('tests/parsing/reference_links_unparsed.txt') as f:
+            test_links_message = f.read()
 
-        ur good
-
-        @@asdf
-
-        @1
-
-        <a href="lol">@2</a>
-
-        your @@ @ 33
-
-        afsoiu wfkj wfe @1 ajs;lfkjasf@1
-
-        @1f
-        '''
+        # We feed the raw post text and hope it's correctly parsed
         with self.app.app_context():
             hopefully_nicely_linked = models.Post.reference_links(test_links_message, 42)
 
-        correctly_parsed_nicely_linked = '''
-        guess what
+        # What the post text *should* be after parsing it
+        with open('tests/parsing/reference_links_parsed.txt') as f:
+            correctly_parsed_nicely_linked = f.read()
 
-        <a href="/threads/1#2" class="reflink">@2</a>
-
-        ur good
-
-        @@asdf
-
-        <a href="lol">@2</a>
-
-        <a href="/threads/1" class="reflink">@1</a>
-
-        @dlasjf;lkjsd
-
-        your @@ @ 33
-
-        afsoiu wfkj wfe <a href="/threads/1#2" class="reflink">@2</a> ajs;lfkjasf<a href="/threads/1" class="reflink">@1</a>
-
-        <a href="/threads/1" class="reflink">@1</a>f
-        '''
         assert hopefully_nicely_linked == correctly_parsed_nicely_linked

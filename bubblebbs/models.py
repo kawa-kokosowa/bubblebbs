@@ -185,14 +185,14 @@ class Post(db.Model):
             else:
                 return '<span class="reflink reflink-invalid">@%d</span>' % at_number
 
-        soup = BeautifulSoup(message, 'html5lib')
+        soup = BeautifulSoup(message, 'html.parser')
         at_link_pattern = re.compile(r'@(\d+)')
-        for text_match in soup.body.find_all(text=True):
+        for text_match in soup.find_all(text=True):
             if re.search(at_link_pattern, text_match) and text_match.parent.name != 'a':
                 new_text = re.sub(at_link_pattern, replace, text_match)
                 text_match.replace_with(new_text)
 
-        return postutils.remove_html5lib_crud(soup)
+        return soup.prettify(formatter=None)
 
     @staticmethod
     def set_bump(form, reply_to, timestamp):

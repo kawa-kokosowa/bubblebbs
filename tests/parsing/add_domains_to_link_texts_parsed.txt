@@ -1,0 +1,11 @@
+Have you read
+<a class="heck external-link" href="http://www.example.org/somebook.pdf">
+ Some Book (www.example.org)
+</a>
+?
+I thought it was similar to
+<a class="internal-link" href="/downloads/anotherbook.pdf">
+ Another
+Book (internal link)
+</a>
+, which is hosted on this website.

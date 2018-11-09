@@ -1,0 +1,51 @@
+<ul>
+<li><a href="#example-markdown-post">Example Markdown Post</a><ul>
+<li><a href="#h3">H3</a><ul>
+<li><a href="#h4">H4</a><ul>
+<li><a href="#h5">H5</a><ul>
+<li><a href="#h6">H6</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#citations">Citations</a></li>
+</ul>
+</li>
+</ul>
+
+<h2 id="example-markdown-post">Example Markdown Post</h2>
+<p>This is an example Markdown post. This is a normal paragraph. Oh look, this paragraph <a href="http://example.org">has a link!</a></p>
+<p><em>This is a bold paragraph.</em></p>
+<p><em>This paragraph is italic.</em></p>
+<p>To use codeblocks just use three of these to open and close: `</p>
+<h3 id="h3">H3</h3>
+<p>Here&rsquo;s some more text and oh look a citation.<sup id="fnrefcats-1"><a class="footnote-ref" href="#fncats-1">1</a></sup></p>
+<h4 id="h4">H4</h4>
+<p>If you do &hellip; it gets turned into a proper ellipsis.</p>
+<p>The HTML specification<br>
+is maintained by the W3C. This paragraph shows off abbreviations.</p>
+<h5 id="h5">H5</h5>
+<p>If use you use &rdquo; they get turned into left and right quotes.</p>
+<p>Here are some definition lists&hellip;</p>
+<dl>
+<dt>Apple</dt>
+<dd>Pomaceous fruit of plants of the genus Malus in<br>
+the family Rosaceae.</dd>
+<dt>Orange</dt>
+<dd>The fruit of an evergreen tree of the genus Citrus.</dd>
+</dl>
+<h6 id="h6">H6</h6>
+<p>If you use apostrophes &lsquo; they get turned into the proper-facing version.</p>
+<p>This is<br>
+a single paragraph<br>
+because of nl2br</p>
+<h3 id="citations">Citations</h3>
+
+
+<ol>
+<li id="fncats-1">
+<p>A rad person?qq3936677670287331zz?<a class="footnote-backref" href="#fnrefcats-1">?zz1337820767766393qq?</a></p>
+</li>
+</ol>
