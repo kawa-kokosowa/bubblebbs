@@ -21,7 +21,7 @@ def truncate(some_string: str, length: int = None):
 # TODO: no need for headline field...
 # Strip HTML...
 def post_summary(post, length=None):
-    return truncate(BeautifulSoup(post.message).find().get_text().split('\n')[0], length=length)
+    return truncate(BeautifulSoup(post.message, 'html.parser').find().get_text().strip().split('\n')[0], length=length)
 
 
 def get_stylesheet():

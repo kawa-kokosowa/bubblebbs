@@ -219,7 +219,7 @@ def ensure_identicon(tripcode: str) -> str:
 
     from . import app  # FIXME: this is hacky
     directory_where_identicons_go = os.path.join(
-        app.app.static_folder,
+        app.blueprint.static_folder,
         'identicons',
     )
     if not os.path.exists(directory_where_identicons_go):

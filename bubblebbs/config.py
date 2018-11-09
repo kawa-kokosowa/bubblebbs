@@ -30,5 +30,5 @@ RATELIMIT_NEW_REPLY = "20 per hour, 1 per second, 2 per minute"
 RATELIMIT_VIEW_TRIP_META = "50 per hour, 15 per minute"
 RATELIMIT_EDIT_TRIP_META = "60 per hour, 1 per second, 4 per minute"
 RATELIMIT_MANAGE_COOKIE = '60 per hour, 1 per second, 7 per minute'
-RATELIMIT_CREATE_THREAD = '7 per hour, 1 per minute'
+RATELIMIT_CREATE_THREAD = '700 per hour, 100 per minute'
 RATELIMIT_NEW_THREAD_FORM = '60 per hour, 1 per second'
