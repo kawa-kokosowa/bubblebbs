@@ -1,13 +1,11 @@
-import os
 import unittest
 
-from bubblebbs import config
 from bubblebbs import app
-from bubblebbs import moderate
-from bubblebbs import models
+from bubblebbs import config
 
 
-class TestPost(unittest.TestCase):
+# FIXME: why does this have setUpClass and setUp?
+class DatabaseTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -35,19 +33,4 @@ class TestPost(unittest.TestCase):
         )
         assert response.status_code == 302
 
-    def test_reference_links(self):
-        """Test the insertion of @2 style post reference links."""
 
-        # The raw post text we hope to turn into something correctly parsed
-        with open('tests/parsing/reference_links_unparsed.txt') as f:
-            test_links_message = f.read()
-
-        # We feed the raw post text and hope it's correctly parsed
-        with self.app.app_context():
-            hopefully_nicely_linked = models.Post.reference_links(test_links_message, 42)
-
-        # What the post text *should* be after parsing it
-        with open('tests/parsing/reference_links_parsed.txt') as f:
-            correctly_parsed_nicely_linked = f.read()
-
-        assert hopefully_nicely_linked == correctly_parsed_nicely_linked
