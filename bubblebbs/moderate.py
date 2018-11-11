@@ -6,12 +6,13 @@ import random
 import typing
 
 from flask import Flask, url_for, redirect, render_template, request
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 from wtforms import form, fields, validators
-from flask.ext import admin, login
+import flask_admin as admin
+import flask_login as login
 from sqlalchemy.exc import IntegrityError
-from flask.ext.admin.contrib import sqla
-from flask.ext.admin import helpers, expose
+from flask_admin.contrib import sqla
+from flask_admin import helpers, expose
 from werkzeug.security import generate_password_hash, check_password_hash
 from jinja2 import Markup
 
