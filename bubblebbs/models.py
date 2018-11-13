@@ -156,44 +156,6 @@ class Post(db.Model):
         )
         return (not first_post_using_name) or first_post_using_name.tripcode == tripcode
 
-    # FIXME
-    @staticmethod
-    def reference_links(message, reply_to: int = None) -> str:
-        """Parse @id links.
-
-        Explicitly avoids generating links within links.
-
-        """
-
-        def replace(match):
-            at_number = int(match.group(1))
-
-            # Construct the link based on determining if this is
-            # a reference to a thread or if it's a reference to a reply
-            post_referenced = Post.query.get(at_number)
-            if not post_referenced:
-                valid = False
-            elif post_referenced.reply_to:
-                link = '%d#%d' % (post_referenced.reply_to, post_referenced.id)
-                valid = True
-            else:
-                link = str(post_referenced.id)
-                valid = True
-
-            if valid:
-                return '<a href="/threads/%s" class="reflink">@%d</a>' % (link, at_number)
-            else:
-                return '<span class="reflink reflink-invalid">@%d</span>' % at_number
-
-        soup = BeautifulSoup(message, 'html.parser')
-        at_link_pattern = re.compile(r'@(\d+)')
-        for text_match in soup.find_all(text=True):
-            if re.search(at_link_pattern, text_match) and text_match.parent.name != 'a':
-                new_text = re.sub(at_link_pattern, replace, text_match)
-                text_match.replace_with(new_text)
-
-        return soup.prettify(formatter=None)
-
     @staticmethod
     def set_bump(form, reply_to, timestamp):
         if reply_to and not form.sage.data:
@@ -209,7 +171,7 @@ class Post(db.Model):
         message = form.message.data
         message = postutils.youtube_link_to_embed(message)
         message = postutils.parse_markdown(message)
-        message = cls.reference_links(message, int(form.reply_to.data) if form.reply_to.data else None)
+        message = postutils.reference_links(cls, message, int(form.reply_to.data) if form.reply_to.data else None)
         message = postutils.add_domains_to_link_texts(message)
 
         # If message gets filtered flag poster's IP

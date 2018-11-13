@@ -1,4 +1,28 @@
 from bubblebbs import postutils
+from bubblebbs import models
+
+from . import testutils
+
+
+class TestDatabasePostUtils(testutils.DatabaseTest):
+    """Test post utilities which require a database connection."""
+
+    def test_reference_links(self):
+        """Test the insertion of @2 style post reference links."""
+
+        # The raw post text we hope to turn into something correctly parsed
+        with open('tests/parsing/reference_links_unparsed.txt') as f:
+            test_links_message = f.read()
+
+        # We feed the raw post text and hope it's correctly parsed
+        with self.app.app_context():
+            hopefully_nicely_linked = postutils.reference_links(models.Post, test_links_message, 42)
+
+        # What the post text *should* be after parsing it
+        with open('tests/parsing/reference_links_parsed.txt') as f:
+            correctly_parsed_nicely_linked = f.read()
+
+        assert hopefully_nicely_linked == correctly_parsed_nicely_linked
 
 
 def test_make_tripcode():
