@@ -214,6 +214,36 @@ def view_specific_post(post_id: int):
         )
 
 
+# FIXME: check if reply or not for error/404, else...
+@blueprint.route("/threads/<int:post_id>/atom.xml")
+# TODO: @limiter.limit(config.RATELIMIT_VIEW_SPECIFIC_POST_ATOM)
+@cache.cached()
+def thread_atom(post_id: int):
+    post = models.db.session.query(models.Post).get(post_id)
+    if post.reply_to:
+        return (
+            render_template(
+                'errors.html',
+                errors=[
+                    'Thread ID supplied is a reply id',
+                    'Thread not found',
+                ],
+            ),
+            404,
+        )
+    else:
+        replies = (
+            models.db.session.query(models.Post)
+            .filter(models.Post.reply_to == post_id)
+        )
+        messages = [post, *replies]
+        return render_template(
+            'thread-atom.xml',
+            messages=messages,
+            op=post,
+        )
+
+
 @blueprint.route("/replies/new", methods=['POST'])
 @limiter.limit(config.RATELIMIT_NEW_REPLY)
 def new_reply():

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Thread #{{ op.id }} Atom Feed</title>
+    <updated>{{ op.bumptime }}</updated>
+
+    {% for message in messages %}
+    <entry>
+    <title>Message #{{ message.id }} in thread #{{ op.id }} </title>
+    <id>{{ url_for('app.view_specific_post', post_id=op.id) }}</id>
+    <updated>{{ message.timestamp }}</updated>
+    <author><name>{{ message.name }}</name></author>
+    <content type="html">
+    {{ message_to_html(message.message, op.id) }}
+    </content>
+    </entry>
+    {% endfor %}
+</feed>
