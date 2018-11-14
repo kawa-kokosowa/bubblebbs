@@ -25,6 +25,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from colorhash import ColorHash
 from pymojihash.pymojihash import hash_to_emoji
+from flask_caching import Cache
 
 from . import forms
 from . import config
@@ -37,11 +38,13 @@ blueprint = Blueprint('app', __name__, static_folder='static')
 limiter = Limiter(
     key_func=get_remote_address,
 )
+cache = Cache(config={'CACHE_TYPE': 'simple'})  # TODO: make config can set to redis in prod
 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(config)
+    cache.init_app(app)
     # TODO: move this all to templating.py
     app.jinja_env.globals.update(
         since_bumptime=templating.since_bumptime,
@@ -54,6 +57,7 @@ def create_app():
         truncate=templating.truncate,
         get_blotter_entries=templating.get_blotter_entries,
         get_stylesheet=templating.get_stylesheet,
+        message_to_html=templating.message_to_html,
         recaptcha_enabled=config.RECAPTCHA_ENABLED,
         recaptcha_site_key=config.RECAPTCHA_SITE_KEY,
     )  # why not move this to templating?
@@ -127,6 +131,7 @@ def ratelimit_handler(e):
 
 @blueprint.route("/", methods=['GET'])
 @limiter.limit(config.RATELIMIT_LIST_THREADS)
+@cache.cached()
 def list_threads():
     """View threads by bumptime in a list.
 
@@ -177,6 +182,7 @@ def list_threads():
 # FIXME: check if reply or not for error/404, else...
 @blueprint.route("/threads/<int:post_id>")
 @limiter.limit(config.RATELIMIT_VIEW_SPECIFIC_POST)
+@cache.cached()
 def view_specific_post(post_id: int):
     """View a thread by ID.
 
@@ -245,6 +251,12 @@ def new_reply():
                 expires=datetime.datetime.now() + datetime.timedelta(days=30),
             )
 
+        # a new reply means that thread lists of all kinds
+        # will probably be outdated, as well as the cache for
+        # a specific thread.
+        # TODO: make it so specific caches can be cleared so that
+        # not every thread's cache is wiped.
+        cache.clear()
         return response
 
     error_response = error_page_form_handler(form)
