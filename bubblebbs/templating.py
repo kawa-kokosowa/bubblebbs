@@ -1,3 +1,8 @@
+"""Code specifically used by Jinja for rendering HTML
+from Jinja templates.
+
+"""
+
 # TODO: move all the model stuff that's templating into here
 import re
 
