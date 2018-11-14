@@ -13,7 +13,7 @@
                     {{ since_bumptime(post.timestamp, post.id) | safe }}
                 </p>
             </header>
-            <div class="message">{{ post.message | safe }}</div>
+            <div class="message">{{ message_to_html(post.message) | safe }}</div>
         </section>
 
       <section class="replies">
@@ -23,7 +23,7 @@
                 <h1>#{{ reply.id }}: {{ post_summary(reply, 60) }}</h1>
                 <p class="meta">By {{ post_name(reply) }} {{ since_bumptime(reply.timestamp, post.id, reply.id) | safe }}</p>
             </header>
-            <div class="message">{{ reply.message | safe }}</div>
+            <div class="message">{{ message_to_html(reply.message, post.id) | safe }}</div>
           </article>
       {% endfor %}
       </section>

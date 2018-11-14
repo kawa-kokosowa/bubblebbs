@@ -54,6 +54,7 @@ def create_app():
         truncate=templating.truncate,
         get_blotter_entries=templating.get_blotter_entries,
         get_stylesheet=templating.get_stylesheet,
+        message_to_html=templating.message_to_html,
         recaptcha_enabled=config.RECAPTCHA_ENABLED,
         recaptcha_site_key=config.RECAPTCHA_SITE_KEY,
     )  # why not move this to templating?

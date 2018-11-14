@@ -16,7 +16,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename  # TODO: use for identicon
 
 from . import config
-from . import postutils
+from . import templating
 
 
 db = SQLAlchemy()
@@ -165,23 +165,6 @@ class Post(db.Model):
                 db.session.commit()
 
     @classmethod
-    def mutate_message(cls, form):
-        """Change the message in various ways before saving to DB."""
-
-        message = form.message.data
-        message = postutils.youtube_link_to_embed(message)
-        message = postutils.parse_markdown(message)
-        message = postutils.reference_links(cls, message, int(form.reply_to.data) if form.reply_to.data else None)
-        message = postutils.add_domains_to_link_texts(message)
-
-        # If message gets filtered flag poster's IP
-        message, was_filtered = WordFilter.replace_all(message)
-        if was_filtered:
-            FlaggedIps.new(request.remote_addr, 'word filter')
-
-        return message
-
-    @classmethod
     def from_form(cls, form):
         """Create and return a Post.
 
@@ -203,9 +186,9 @@ class Post(db.Model):
 
         # FIXME: should sanitize first?
         # Prepare info for saving to DB
-        name, tripcode = postutils.make_tripcode(form.name.data)
+        name, tripcode = templating.make_tripcode(form.name.data)
         if all([name, tripcode]):
-            identicon = postutils.ensure_identicon(tripcode)
+            identicon = templating.ensure_identicon(tripcode)
             matches_original_use = cls.name_tripcode_matches_original_use(name, tripcode)
             verified = matches_original_use
             if not verified:
@@ -214,14 +197,13 @@ class Post(db.Model):
             verified = False
 
         timestamp = datetime.datetime.utcnow()
-        message = cls.mutate_message(form)
 
         # Save!
         new_post = cls(
             name=name,
             tripcode=tripcode,
             timestamp=timestamp,
-            message=message,
+            message=form.message.data,
             verified=verified,
             reply_to=reply_to,
             ip_address=request.remote_addr,
@@ -256,7 +238,7 @@ class Page(db.Model):
 
     @classmethod
     def from_form(cls, form):
-        body = postutils.parse_markdown('lol', form.source.data)
+        body = templating.parse_markdown('lol', form.source.data)
         return cls(body=body, slug=form.slug.data, source=form.body.data)
 
 
