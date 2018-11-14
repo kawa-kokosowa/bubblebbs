@@ -6,6 +6,7 @@ bs4==0.0.1
 click==6.7
 colorhash==1.0.2
 Flask==1.0.2
+Flask-Caching==1.0.0
 Flask-Admin==1.5.1
 Flask-Limiter==1.0.1
 Flask-Login==0.4.1
