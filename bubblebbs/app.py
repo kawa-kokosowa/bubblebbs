@@ -1,4 +1,3 @@
-# TODO: rename this routes.py? put app factory in another file?
 import os
 import random
 from urllib.parse import quote
