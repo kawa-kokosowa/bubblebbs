@@ -125,8 +125,19 @@ class FlaggedIps(db.Model):
         db.session.flush()
 
 
+# TODO: this is a confusing name
+tags = db.Table('tags',
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True),
+    db.Column('post', db.Integer, db.ForeignKey('post.id'), primary_key=True),
+)
+
+
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120))
+
+
 # FIXME: bad schema...
-# TODO: tags
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
@@ -140,6 +151,23 @@ class Post(db.Model):
     reply_to = db.Column(db.Integer, db.ForeignKey('posts.id'))
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     bumptime = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+    tags = db.relationship(
+        'Tag',
+        secondary=tags,
+        lazy='subquery',
+        backref=db.backref('pages', lazy=True),
+    )
+
+    @staticmethod
+    def tags_from_message(message: str) -> list[Tag]:
+        """Find a list of tags inside message and return a 
+        list of Tag models.
+
+        """
+
+        # See if tags exist first, if they do fetch them and add them
+        # to the list. If not, create the new tags and add them to the
+        # list.
 
     @staticmethod
     def name_tripcode_matches_original_use(name: str, tripcode: str) -> bool:
