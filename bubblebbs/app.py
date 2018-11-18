@@ -25,6 +25,7 @@ from flask_limiter.util import get_remote_address
 from colorhash import ColorHash
 from pymojihash.pymojihash import hash_to_emoji
 from flask_caching import Cache
+from flask_socketio import SocketIO
 
 from . import forms
 from . import config
@@ -38,12 +39,14 @@ limiter = Limiter(
     key_func=get_remote_address,
 )
 cache = Cache(config={'CACHE_TYPE': 'simple'})  # TODO: make config can set to redis in prod
+socketio = SocketIO()
 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(config)
     cache.init_app(app)
+    socketio.init_app(app)
     # TODO: move this all to templating.py
     app.jinja_env.globals.update(
         since_bumptime=templating.since_bumptime,
@@ -93,7 +96,7 @@ def create_app():
 
     app.register_blueprint(blueprint)
 
-    return app
+    return app, socketio
 
 
 def config_db(key: str) -> str:
